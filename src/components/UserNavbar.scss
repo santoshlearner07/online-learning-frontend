@@ -13,7 +13,7 @@
 }
 
 .modal-content {
-    background-color: blue;
+    background-color: white;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -24,4 +24,14 @@
 
 .modal-content h2 {
     margin-top: 0;
+}
+
+.hide-on-mobile{
+    display: block;
+}
+
+@media (max-width: 600px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
 }

@@ -1,3 +1,8 @@
+interface NavButtonProps {
+  handleOpen: () => void; // This matches the function signature
+}
+
+
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -12,21 +17,26 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import './UserNavbar.scss'
+import Profile from './Profile';
+
+
 const pages = [
   { name: 'Dashboard', path: '/main/' },
   { name: 'My Courses', path: '/main/courses/' },
   { name: 'Support', path: '/main/support/' }
 ];
+
 const settings = [
   'Profile', 'Account', 'Logout'
 ];
 
-function UserNavbar() {
+function UserNavbar({ handleOpen }: NavButtonProps) {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
+  const navigate = useNavigate();
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -51,7 +61,7 @@ function UserNavbar() {
   // State to track which setting was clicked
   const [selectedSetting, setSelectedSetting] = React.useState(null);
 
-  const handleSettingClick = (settingName) => {
+  const handleSettingClick = (settingName: any) => {
     // 1. Capture the setting and open the modal
     setSelectedSetting(settingName);
     setIsModalOpen(true);
@@ -64,6 +74,12 @@ function UserNavbar() {
     setIsModalOpen(false);
     setSelectedSetting(null);
   };
+
+  const handleLogout = () =>{
+    localStorage.clear();
+   navigate('/login') 
+  }
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -154,9 +170,10 @@ function UserNavbar() {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
+            <Button className='hide-on-mobile' color='warning' variant='contained' style={{marginRight:"10px"}} onClick={handleOpen}>Book a Free Trial</Button>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" src="" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -189,18 +206,24 @@ function UserNavbar() {
       {isModalOpen && (
         <div className="modal-backdrop">
           <div className="modal-content">
-            <h2>{selectedSetting} Settings</h2>
+            <h2 style={{ color: "black" }}>{selectedSetting} Settings</h2>
 
             {/* ⭐️ Conditional Rendering for Modal Content */}
-            {selectedSetting === 'Profile' && (
-              <p>Here you can update your public profile information.</p>
+            {selectedSetting === `Profile` && (
+              <div>
+                <Profile />
+              </div>
             )}
             {selectedSetting === 'Account' && (
-              <p>Manage your login, password, and subscriptions.</p>
+              <p style={{color:"black"}} >Under Maintenance!!!</p>
             )}
             {selectedSetting === 'Logout' && (
-              // For 'Logout', you'd typically have a function here
-              <p>Are you sure you want to log out?</p>
+              <div style={{ color: "black" }}>
+                <h1>Are you sure you want to Logout ? </h1>
+                <Button variant="contained" color="success" onClick={handleLogout} >
+                  Logout
+                </Button>
+              </div>
             )}
 
             <button onClick={handleModalClose}>Close</button>

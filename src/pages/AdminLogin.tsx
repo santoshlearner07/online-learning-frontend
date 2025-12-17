@@ -7,11 +7,10 @@ import axios from 'axios';
 import { Button, FormControl, Input, InputLabel } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import './Login.scss'
 
-function Login() {
+function AdminLogin() {
 
-    const API_URL = 'http://localhost:5000/api/login';
+    const API_URL = 'http://localhost:5000/api/admin/login';
 
     const [loginData, setLoginData] = useState<FormLoginData>({
         email: '',
@@ -51,7 +50,7 @@ function Login() {
             // Redirect the user or update global state
             console.log('User Data:', response);
 
-            navigate('/main');
+            // navigate('/main');
 
         } catch (error) {
             console.error('Login failed:', error);
@@ -69,7 +68,7 @@ function Login() {
         <section className='loginSection'>
 
             <form onSubmit={handleSubmit}>
-                <h1>User Login</h1>
+                <h1>Admin Login</h1>
 
                 {message && (
                     <div style={{ color: isError ? 'red' : 'green', margin: '10px 0' }}>
@@ -87,11 +86,11 @@ function Login() {
                 <Button type="submit" style={{ backgroundColor: "green", color: "black" }}>
                     Log In
                 </Button> <br /><br />
-                <b >Not a member? <Link to="/register" style={{ font: "15px", color: "black" }}>Register</Link></b> <br /><br />
-                <b ><Link to="/admin" style={{ font: "15px", color: "black" }}>Admin Login</Link></b>
+                {/* <b >Not a member? <Link to="/register" style={{ font: "15px", color: "black" }}>Register</Link></b> <br /><br /> */}
+                {/* <b ><Link to="/admin" style={{ font: "15px", color: "black" }}>Admin Login</Link></b> */}
             </form>
         </section>
     )
 }
 
-export default Login
+export default AdminLogin
