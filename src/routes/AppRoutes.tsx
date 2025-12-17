@@ -1,0 +1,24 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import LandingPage from '../pages/LandingPage'
+import Register from '../pages/Register'
+import Login from '../pages/Login'
+import MainPage from '../components/MainPage'
+
+function AppRoutes() {
+    return (
+
+        <div>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' element={<LandingPage />} />
+                    <Route path='/register' element={<Register />} />
+                    <Route path='/login' element={<Login />} />
+                    <Route path='/main' element={<MainPage />} />
+                </Routes>
+            </BrowserRouter>
+        </div>
+    )
+}
+
+
+export default AppRoutes

@@ -1,0 +1,30 @@
+/* index.css */
+
+/* 1. Global Reset for Margins and Padding */
+* {
+    /* The universal selector targets ALL elements */
+    margin: 0;
+    padding: 0;
+    /* Optional but highly recommended: ensures padding and border are included 
+       in the element's total width and height, making layout much easier. */
+    box-sizing: border-box; 
+}
+
+/* 2. Specific Body Reset (for good measure) */
+body {
+    /* Ensures the body takes up the full viewport height */
+    min-height: 100vh;
+    /* Often necessary to ensure no weird styles remain */
+    margin: 0; 
+}
+
+/* 3. HTML Element Reset */
+html {
+    /* Sets the foundation for responsive font sizing */
+    font-size: 100%; 
+}
+
+/* 4. Heading Margin Reset (Crucial if your first element is a heading) */
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0; 
+}
