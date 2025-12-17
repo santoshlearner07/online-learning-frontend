@@ -3,6 +3,8 @@ import LandingPage from '../pages/LandingPage'
 import Register from '../pages/Register'
 import Login from '../pages/Login'
 import MainPage from '../components/MainPage'
+import Courses from '../pages/Courses'
+import Support from '../pages/Support'
 
 function AppRoutes() {
     return (
@@ -14,6 +16,8 @@ function AppRoutes() {
                     <Route path='/register' element={<Register />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/main' element={<MainPage />} />
+                    <Route path='/main/courses/' element={<Courses />} />
+                    <Route path='/main/support/' element={<Support />} />
                 </Routes>
             </BrowserRouter>
         </div>

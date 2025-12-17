@@ -3,6 +3,7 @@ export interface UserDetails {
 }
 import React, { use, useEffect, useState } from 'react'
 import PhotoUpload from './PhotoUpload';
+import UserNavbar from './UserNavbar';
 
 function MainPage() {
 
@@ -24,14 +25,16 @@ function MainPage() {
   }, []);
 
   return (
-    <section>
+    <section style={{ padding:"20px"}}>
+      <UserNavbar />
+      <h1>Dashboard</h1>
       <div style={{ border: "1px solid grey", borderRadius: "10px" }}>
         {
           user ? (
             <div>
               <PhotoUpload />
               <h3>Welcome, {user.firstName}!</h3>
-              <ul>
+              {/* <ul>
                 <li><strong>First Name:</strong> {user.firstName}</li>
                 <li><strong>Last Name:</strong> {user.lastName}</li>
                 <li><strong>Email:</strong> {user.email}</li>
@@ -41,7 +44,7 @@ function MainPage() {
                 {user.userAddress &&
                   <li><strong>Address:</strong> {user.userAddress}</li>
                 }
-              </ul>
+              </ul> */}
             </div>
           ) : (
             <div></div>
