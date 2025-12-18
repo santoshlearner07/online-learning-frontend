@@ -42,7 +42,7 @@ function Login() {
             const { token, firstName, email } = response.data;
 
             // Store the JWT in local storage
-            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token);
             localStorage.setItem('_id', JSON.stringify(response.data._id));
             localStorage.setItem('data', JSON.stringify(response.data));
             setMessage(`Welcome back, ${firstName}! You are now logged in.`);

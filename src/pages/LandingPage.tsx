@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 function LandingPage() {
     return (
         <>
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexGrow: 1,padding:"20px" }}>
                 <AppBar position="static">
                     <Toolbar>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -22,6 +22,7 @@ function LandingPage() {
                         </Link>
                     </Toolbar>
                 </AppBar>
+                
             </Box>
         </>
     )

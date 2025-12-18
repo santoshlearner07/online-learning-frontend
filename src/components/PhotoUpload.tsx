@@ -40,7 +40,7 @@ const PhotoUpload: React.FC = () => {
 
     // useEffect for Initialization and Data Fetching ---
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token');
         
         if (!token) {
             alert('You must be logged in to use this feature.');
@@ -79,7 +79,7 @@ const PhotoUpload: React.FC = () => {
         }
 
         const id = getUserId();
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token');
         
         if (!id || !token) {
              alert('Cannot upload: Session data is missing.');

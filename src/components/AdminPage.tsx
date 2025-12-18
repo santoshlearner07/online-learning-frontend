@@ -66,64 +66,70 @@ function AdminPage() {
     return (
         <div style={{ padding: '20px' }}>
             <h1>Admin Dashboard: All Users and Admin</h1>
-            <table border={1} style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {/* 4. Map through the users and display them */}
-                    {allUser && allUser.length > 0 ? (
-                        allUser.map((user: any, index: number) => (
-                            <tr key={user._id || index}>
-                                <td>{user.role}</td>
-                                <td>{user.firstName}</td>
-                                <td>{user.lastName}</td>
-                                <td>{user.email}</td>
-                                <td>{user.phoneNumber || 'N/A'}</td>
+            <div style={{display:'flex',justifyContent:'space-between'}}>
+                <div>
+                    <table border={1} style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={4} style={{ textAlign: 'center' }}>Nothing to display</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-            <table border={1} style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {/* 4. Map through the users and display them */}
-                    {allAdmin && allAdmin.length > 0 ? (
-                        allAdmin.map((admin: any, index: number) => (
-                            <tr key={admin._id || index}>
-                                <td>{admin.role}</td>
-                                <td>{admin.firstName}</td>
-                                <td>{admin.lastName}</td>
-                                <td>{admin.email}</td>
-                                <td>{admin.phoneNumber || 'N/A'}</td>
+                        </thead>
+                        <tbody>
+                            {/* 4. Map through the users and display them */}
+                            {allUser && allUser.length > 0 ? (
+                                allUser.map((user: any, index: number) => (
+                                    <tr key={user._id || index}>
+                                        <td>{user.role}</td>
+                                        <td>{user.firstName}</td>
+                                        <td>{user.lastName}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.phoneNumber || 'N/A'}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={4} style={{ textAlign: 'center' }}>Nothing to display</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <table border={1} style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={4} style={{ textAlign: 'center' }}>Nothing to display</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            {/* 4. Map through the users and display them */}
+                            {allAdmin && allAdmin.length > 0 ? (
+                                allAdmin.map((admin: any, index: number) => (
+                                    <tr key={admin._id || index}>
+                                        <td>{admin.role}</td>
+                                        <td>{admin.firstName}</td>
+                                        <td>{admin.lastName}</td>
+                                        <td>{admin.email}</td>
+                                        <td>{admin.phoneNumber || 'N/A'}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={4} style={{ textAlign: 'center' }}>Nothing to display</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     )
 }

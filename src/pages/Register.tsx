@@ -1,5 +1,5 @@
 export interface FormData {
-    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role:string
+    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role:string;
 }
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'

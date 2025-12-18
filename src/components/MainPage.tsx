@@ -1,16 +1,61 @@
 export interface UserDetails {
-  firstName: string; lastName: string; email: string; number: number; userAddress?: string; country: string; age: number;
+  firstName: string; lastName: string; email: string; number: number; userAddress?: string; country: string; age: number; demoStatus: string
+}
+export interface DemoBookingData {
+  subject: string;
+  preferredDate: string;
+  preferredTime: string;
 }
 import React, { useEffect, useState } from 'react'
 import PhotoUpload from './PhotoUpload';
 import UserNavbar from './UserNavbar';
-import { Button, Modal, Typography, Box } from '@mui/material';
+import { Button, Modal, Typography, Box, TextField, Select, MenuItem } from '@mui/material';
+import axios from 'axios';
 function MainPage() {
-
+  const API_URL = 'http://localhost:5000/api/demo-booking';
   const [user, setUser] = useState<UserDetails | null>(null);
   const [open, setOpen] = React.useState(false);
+  const [formData, setFormData] = useState<DemoBookingData>({
+    subject: '',
+    preferredDate: '',
+    preferredTime: ''
+  });
+  const subjects = ['Coding', 'Math', 'Web Development', 'React.js', 'Python', 'Other'];
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const minDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const token = localStorage.getItem('token');
+  // console.log(token)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const selectedDateTime = new Date(`${formData.preferredDate}T${formData.preferredTime}`);
+    const now = new Date();
+    const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    if (selectedDateTime < twentyFourHoursFromNow) {
+      alert("Please schedule your demo at least 24 hours in advance to allow our mentors to prepare.");
+      return;
+    }
+
+    try {
+      const combinedDateTime = new Date(`${formData.preferredDate}T${formData.preferredTime}`);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      await axios.put(API_URL, {
+        subject: formData.subject,
+        demoSlot: combinedDateTime
+      }, config);
+      alert('Demo Booked Successfully!');
+      handleClose();
+    } catch (err) {
+      console.error('Booking failed', err);
+    }
+  };
+
   useEffect(() => {
     const storageData = localStorage.getItem('data')
 
@@ -40,7 +85,7 @@ function MainPage() {
 
   return (
     <section style={{ padding: "20px" }}>
-      <UserNavbar handleOpen = {handleOpen}/>
+      <UserNavbar handleOpen={handleOpen} />
       <h1>Dashboard</h1>
       <div style={{ border: "1px solid grey", borderRadius: "10px" }}>
         {
@@ -65,6 +110,9 @@ function MainPage() {
             <p>
               ⭐ No credit/Debit card or Cash required for the demo session.
             </p>
+            You have got a 1 Free schdeule left book it as early as possible with your convient time and date.
+            Change this <b>{user?.demoStatus}</b> to Schedule
+
             <p>
               <Button color='warning' variant='contained' onClick={handleOpen}>Book a Free Trial</Button>
               <Modal
@@ -74,12 +122,40 @@ function MainPage() {
                 aria-describedby="modal-modal-description"
               >
                 <Box sx={style}>
-                  <Typography id="modal-modal-title" variant="h6" component="h2">
-                    Text in a modal
-                  </Typography>
-                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                  </Typography>
+                  <h3>Demo details</h3>
+                  <form onSubmit={handleSubmit} className="booking-form">
+                    {/* Subject of Interest */}
+                    <label>Subject of Interest</label>
+                    <Select
+                      required
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    >
+                      <option value="">Select a Subject</option>
+                      {subjects.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                    </Select>
+                    <br /><br />
+
+                    <label>Preferred Date</label>
+                    <TextField
+                      size='small'
+                      type="date"
+                      required
+                      inputProps={{ min: minDate }}
+                      onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+                    />
+
+                    <br /><br />
+                    <label>Preferred Time</label>
+                    <TextField
+                      size='small'
+                      type="time"
+                      required
+                      onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
+                    />
+
+                    <button type="submit">Confirm Demo Session</button>
+                  </form>
                 </Box>
               </Modal>
             </p>
