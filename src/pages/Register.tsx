@@ -1,5 +1,5 @@
 export interface FormData {
-    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string;
+    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role:string
 }
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
@@ -13,7 +13,7 @@ function Register() {
     const baseUrl = 'http://localhost:5000/api/register'
 
     const [formData, setFormData] = useState<FormData>({
-        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: ""
+        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role:'student'
     });
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
@@ -56,7 +56,7 @@ function Register() {
             setIsError(false);
 
             setFormData({
-                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: ""
+                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role:'student'
             });
 
         } catch (error) {

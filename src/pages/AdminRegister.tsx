@@ -1,5 +1,5 @@
 export interface FormData {
-    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string;
+    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role: string
 }
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
@@ -13,7 +13,7 @@ function AdminRegister() {
     const baseUrl = 'http://localhost:5000/api/admin/register'
 
     const [formData, setFormData] = useState<FormData>({
-        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: ""
+        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'admin'
     });
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
@@ -51,14 +51,14 @@ function AdminRegister() {
         }
         try {
             const response = await axios.post(baseUrl, formData);
-
+            // const response1 = await axios.post('http://localhost:5000/api/register', formData);
             setMessage(response.data.msg || 'Registration successful!');
             setIsError(false);
 
             setFormData({
-                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: ""
+                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'admin'
             });
-                navigate('/admin')
+            navigate('/admin')
         } catch (error) {
             console.error('Registration failed:', error);
 
@@ -81,13 +81,13 @@ function AdminRegister() {
                 <Grid size={6} className="secondGrid">
 
                     <form onSubmit={handleSubmit}>
-                    <h1>AdminRegister</h1> <br />
+                        <h1>AdminRegister</h1> <br />
 
-                    {message && (
-                        <div style={{ color: isError ? 'red' : 'green', margin: '10px 0' }}>
-                            {message}
-                        </div>
-                    )}
+                        {message && (
+                            <div style={{ color: isError ? 'red' : 'green', margin: '10px 0' }}>
+                                {message}
+                            </div>
+                        )}
                         <FormControl className='form-control'>
                             <InputLabel htmlFor="my-input">First name</InputLabel>
                             <Input id="my-input" aria-describedby="my-helper-text" value={formData.firstName} name='firstName' onChange={handleChange} />
@@ -123,7 +123,7 @@ function AdminRegister() {
                         <FormControl className='form-control'>
                             <Button type="submit" disabled={!formData}>Register</Button>
                         </FormControl>
-                    <p>Already an Admin? <Link to="/admin">Sign In</Link></p>
+                        <p>Already an Admin? <Link to="/admin">Sign In</Link></p>
                     </form>
                 </Grid>
             </Grid>

@@ -41,7 +41,7 @@ function AdminLogin() {
             const { token, firstName, email } = response.data;
 
             // Store the JWT in local storage
-            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token);
             localStorage.setItem('_id', JSON.stringify(response.data._id));
             localStorage.setItem('data', JSON.stringify(response.data));
             setMessage(`Welcome back, ${firstName}! You are now logged in.`);
@@ -50,7 +50,7 @@ function AdminLogin() {
             // Redirect the user or update global state
             console.log('User Data:', response);
 
-            // navigate('/main');
+            navigate('/admin/dashboard');
 
         } catch (error) {
             console.error('Login failed:', error);
