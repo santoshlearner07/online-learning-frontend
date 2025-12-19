@@ -1,6 +1,6 @@
-export interface UserDetails {
-    firstName: string; lastName: string; email: string; number: number; address?: string; country: string; age: number;
-}
+// export interface UserDetails {
+//     firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number;
+// }
 
 import { Box, Button, TextField } from '@mui/material'
 import axios from 'axios';
@@ -10,60 +10,58 @@ import EmailIcon from '@mui/icons-material/Email';
 import BadgeIcon from '@mui/icons-material/Badge';
 import PinIcon from '@mui/icons-material/Pin';
 import HomeIcon from '@mui/icons-material/Home';
+import { useAuthStore } from '../store/useAuthStore';
+
 function Profile() {
-    const [user, setUser] = useState<UserDetails>({
+    const { user, token,  setUser } = useAuthStore();
+    
+    const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
-        email: '',
-        number: 0,
-        address: '',
+        userAge: 0,
         country: '',
-        age: 0
+        userAddress: '',
+        phoneNumber: '',
+        email:''
     });
 
     useEffect(() => {
-        const storageData = localStorage.getItem('data')
-
-        if (storageData) {
-            try {
-                const parsedUser = JSON.parse(storageData);
-                setUser(parsedUser);
-            } catch (error) {
-                console.error('Error parsing user data: ', error);
-                localStorage.removeItem('data');
-            }
+        if (user) {
+            setFormData({
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                userAge: user.userAge || 0,
+                country: user.country || '',
+                userAddress: user.userAddress || '',
+                phoneNumber: user.phoneNumber?.toString() || '',
+                email:user.email || ''
+            });
         }
-
-    }, []);
+    }, [user]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setUser((prevUser) => ({
-            ...prevUser,
-            [name]: value,
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
         }));
     };
 
     const handleUpdate = async (e: FormEvent) => {
         e.preventDefault();
 
-        const storageData = localStorage.getItem('data');
-        if (!storageData) return alert("No user data found. Please login again.");
-
-        const parsedData = JSON.parse(storageData);
-        const token = parsedData.token; // Ensure this matches your login response key
+        if (!token) return alert("No user data found. Please login again.");
 
         try {
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`, // 🔑 This fixes the 401 error
+                    Authorization: `Bearer ${token}`, // 
                 },
             };
 
-            const { data } = await axios.put(`http://localhost:5000/api/profile`, user, config);
-
-            localStorage.setItem('data', JSON.stringify(data));
+            const { data } = await axios.put(`http://localhost:5000/api/profile`, formData, config);
+            setUser(data.user)
             alert("Profile updated!");
 
         } catch (error: any) {
@@ -81,14 +79,14 @@ function Profile() {
                 <TextField
                     hiddenLabel
                     name="firstName" id="filled-hidden-label-small"
-                    value={user?.firstName}
+                    value={formData?.firstName}
                     variant="filled"
                     size="small" onChange={handleChange}
                 />
                 <TextField
                     hiddenLabel
                     name="lastName" id="filled-hidden-label-small"
-                    value={user?.lastName}
+                    value={formData?.lastName}
                     variant="filled"
                     size="small" onChange={handleChange}
                 />
@@ -98,7 +96,7 @@ function Profile() {
                 <TextField
                     hiddenLabel
                     name="email" id="filled-hidden-label-small"
-                    defaultValue={user?.email}
+                    defaultValue={formData?.email}
                     variant="filled"
                     size="small" onChange={handleChange}
                     disabled
@@ -107,8 +105,8 @@ function Profile() {
             <div>
                 <CallIcon /> <TextField
                     hiddenLabel
-                    name="number" id="filled-hidden-label-small"
-                    defaultValue={user?.number}
+                    name="phoneNumber" id="filled-hidden-label-small"
+                    defaultValue={formData?.phoneNumber}
                     variant="filled"
                     size="small" onChange={handleChange}
                     disabled
@@ -117,8 +115,8 @@ function Profile() {
             <div>
                 <PinIcon /> <TextField
                     hiddenLabel
-                    name="age" id="filled-hidden-label-small"
-                    value={user?.age}
+                    name="userAge" id="filled-hidden-label-small"
+                    value={formData?.userAge}
                     variant="filled"
                     size="small" onChange={handleChange}
                 />
@@ -127,14 +125,14 @@ function Profile() {
                 <HomeIcon />  <TextField
                     hiddenLabel
                     name="country" id="filled-hidden-label-small"
-                    value={user?.country}
+                    value={formData?.country}
                     variant="filled"
                     size="small" onChange={handleChange}
                 />
                 <TextField
                     hiddenLabel
-                    name="address" id="filled-hidden-label-small"
-                    value={user?.address}
+                    name="userAddress" id="filled-hidden-label-small"
+                    value={formData?.userAddress}
                     variant="filled"
                     size="small" onChange={handleChange}
                 />

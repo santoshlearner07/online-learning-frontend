@@ -8,6 +8,7 @@ import { Button, FormControl, Input, InputLabel } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import './Login.scss'
+import { useAuthStore } from '../store/useAuthStore';
 
 function Login() {
 
@@ -39,12 +40,10 @@ function Login() {
             // Send email and password to the backend
             const response = await axios.post(API_URL, loginData);
 
-            const { token, firstName, email } = response.data;
+            const { token, firstName, user } = response.data;
 
-            // Store the JWT in local storage
-            localStorage.setItem('token', token);
-            localStorage.setItem('_id', JSON.stringify(response.data._id));
-            localStorage.setItem('data', JSON.stringify(response.data));
+            useAuthStore.getState().setUser(user);
+            useAuthStore.getState().setToken(token);
             setMessage(`Welcome back, ${firstName}! You are now logged in.`);
             setIsError(false);
 

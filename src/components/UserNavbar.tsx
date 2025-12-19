@@ -1,8 +1,3 @@
-interface NavButtonProps {
-  handleOpen: () => void; // This matches the function signature
-}
-
-
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -18,7 +13,6 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { Link, useNavigate } from 'react-router-dom';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import './UserNavbar.scss'
 import Profile from './Profile';
 
@@ -33,7 +27,7 @@ const settings = [
   'Profile', 'Account', 'Logout'
 ];
 
-function UserNavbar({ handleOpen }: NavButtonProps) {
+function UserNavbar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
@@ -162,6 +156,7 @@ function UserNavbar({ handleOpen }: NavButtonProps) {
             {pages.map((page, index) => (
               <Button
                 key={index}
+                
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
@@ -170,7 +165,7 @@ function UserNavbar({ handleOpen }: NavButtonProps) {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <Button className='hide-on-mobile' color='warning' variant='contained' style={{marginRight:"10px"}} onClick={handleOpen}>Book a Free Trial</Button>
+            {/* <Button className='hide-on-mobile' color='warning' variant='contained' style={{marginRight:"10px"}} onClick={handleOpen}>Book a Free Trial</Button> */}
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="" />

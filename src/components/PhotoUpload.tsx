@@ -1,160 +1,99 @@
+import React, { useState, useRef, type ChangeEvent } from 'react';
 import axios from 'axios';
-import React, { useState, useRef, useEffect, type ChangeEvent } from 'react';
+import { useAuthStore } from '../store/useAuthStore'; 
 
 const API_UPLOAD_URL = 'http://localhost:5000/api/upload';
-const API_PROFILE_URL = 'http://localhost:5000/api/profile';
-const BASE_URL = 'http://localhost:5000'; 
+const BASE_URL = 'http://localhost:5000';
 
 const PhotoUpload: React.FC = () => {
+    const { user, token, updateProfileImage } = useAuthStore();
+    
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loading, setLoading] = useState(true); // New loading state
+    const [localPreview, setLocalPreview] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // --- Helper to get user ID ---
-    const getUserId = () => localStorage.getItem('_id');
+    const displayImage = localPreview || (user?.profileImagePath ? `${BASE_URL}${user.profileImagePath}` : null);
 
-    // Function to fetch the user's current image path ---
-    const fetchUserProfileImage = async (token: string) => {
-        try {
-            const response = await axios.get(API_PROFILE_URL, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            
-            const imagePath = response.data.profileImage; 
-            
-            if (imagePath) {
-                setImagePreviewUrl(`${BASE_URL}${imagePath}`);
-            }
-        } catch (error) {
-            console.error('Failed to fetch initial profile image:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    // useEffect for Initialization and Data Fetching ---
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-            alert('You must be logged in to use this feature.');
-            setIsLoggedIn(false);
-            setLoading(false);
-        } else {
-            setIsLoggedIn(true);
-            fetchUserProfileImage(token);
-        }
-    }, []); 
-    
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files ? event.target.files[0] : null;
-
+        const file = event.target.files?.[0];
         if (file) {
             setSelectedFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                // Set the local preview URL when a new file is selected
-                setImagePreviewUrl(reader.result as string); 
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setSelectedFile(null);
+            setLocalPreview(URL.createObjectURL(file)); // Better than FileReader for simple previews
         }
-    };
-    
-    const handleIconClick = () => {
-        fileInputRef.current?.click();
     };
 
     const handleUpload = async () => {
-        if (!selectedFile || !isLoggedIn) {
-            alert('Cannot upload: File or login status missing.');
-            return;
-        }
+        if (!selectedFile || !token || !user) return;
 
-        const id = getUserId();
-        const token = localStorage.getItem('token');
-        
-        if (!id || !token) {
-             alert('Cannot upload: Session data is missing.');
-             return;
-        }
-
+        setUploading(true);
         const formData = new FormData();
         formData.append('profileImage', selectedFile);
-        formData.append('id', id); 
+        formData.append('id', user.email); // or user._id if you have it
 
         try {
             const response = await axios.post(API_UPLOAD_URL, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}` 
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             const serverPath = response.data.filePath;
-            // Set the image URL to the server path immediately
-            setImagePreviewUrl(`${BASE_URL}${serverPath}`); 
-
-            alert('Image uploaded and profile updated!');
-
+            
+            updateProfileImage(serverPath);
+            setLocalPreview(null); // Clear local preview
+            setSelectedFile(null);
+            alert('Profile picture updated!');
         } catch (error) {
             console.error('Upload failed:', error);
-            alert('Image upload failed. Check server logs.');
+            alert('Upload failed.');
+        } finally {
+            setUploading(false);
         }
     };
 
-    if (loading) {
-        return <div>Loading user data...</div>;
-    }
-    
-    if (!isLoggedIn) {
-        return <div>Please log in to view and upload images.</div>;
-    }
+    if (!user) return <p>Please log in.</p>;
 
     return (
-        <div>
-             <div
+        <div style={{ textAlign: 'center' }}>
+            <div
                 style={{
                     cursor: 'pointer',
                     width: '100px',
                     height: '100px',
-                    border: '2px dashed gray',
+                    border: '2px dashed #ff9800',
                     borderRadius: '50%',
+                    margin: '0 auto',
+                    overflow: 'hidden',
                     display: 'flex',
-                    justifyContent: 'center',
                     alignItems: 'center',
-                    overflow: 'hidden'
+                    justifyContent: 'center'
                 }}
-                onClick={handleIconClick}
+                onClick={() => fileInputRef.current?.click()}
             >
-                {imagePreviewUrl ? (
-                    <img
-                        src={imagePreviewUrl}
-                        alt="Profile Image"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
+                {displayImage ? (
+                    <img src={displayImage} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                    <span style={{ fontSize: '30px' }}>📸</span>
+                    <span>📸</span>
                 )}
             </div>
 
-            <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-                accept="image/*"
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                onChange={handleFileChange} 
+                accept="image/*" 
             />
 
-            <button onClick={handleUpload} disabled={!selectedFile || !isLoggedIn} style={{ marginTop: '10px' }}>
-                Upload Image
-            </button>
+            {selectedFile && (
+                <button 
+                    onClick={handleUpload} 
+                    disabled={uploading}
+                    style={{ marginTop: '10px', backgroundColor: '#ff9800', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px' }}
+                >
+                    {uploading ? 'Uploading...' : 'Confirm New Photo'}
+                </button>
+            )}
         </div>
     );
 };
