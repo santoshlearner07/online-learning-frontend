@@ -86,8 +86,10 @@ function Login() {
                 <Button type="submit" style={{ backgroundColor: "green", color: "black" }}>
                     Log In
                 </Button> <br /><br />
-                <b >Not a member? <Link to="/register" style={{ font: "15px", color: "black" }}>Register</Link></b> <br /><br />
-                <b ><Link to="/admin" style={{ font: "15px", color: "black" }}>Admin Login</Link></b>
+                <span style={{ fontWeight: "bold",display:"flex",justifyContent:"space-between" }} >
+                    <span> Not a member? <Link to="/register" style={{ font: "15px", color: "black" }}>Register</Link></span>
+                    <span>  <Link to="/admin" style={{ font: "15px", color: "black" }}>Admin Login</Link></span>
+                </span>
             </form>
         </section>
     )

@@ -1,3 +1,5 @@
+export const baseURL = 'http://localhost:5000/api'
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Register from '../pages/Register'
 import Login from '../pages/Login'

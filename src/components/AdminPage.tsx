@@ -1,137 +1,73 @@
-interface User {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    userAddress?: string;
-    phoneNumber?: number;
-}
-interface Admin {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    userAddress?: string;
-    phoneNumber?: number;
-}
-
-
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import { useEffect } from 'react';
+import { useAdminStore } from '../store/useAdminStore';
+import RegisterTeacher from '../pages/RegisterTeacher';
+import { useAuthStore } from '../store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
 
 function AdminPage() {
-    const GET_USER_URL = 'http://localhost:5000/api/admin/alluser'
-    const GET_Admin_URL = 'http://localhost:5000/api/admin/alladmin'
-
-    const [allUser, setAllUser] = useState<User[]>();
-    const [allAdmin, setAllAdmin] = useState<Admin[]>();
-    const [loading, setLoading] = useState<boolean>(true);
-
-    const fetchUsers = async () => {
-        try {
-            const { data } = await axios.get(GET_USER_URL, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            setAllUser(data);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-    const fetchAdmins = async () => {
-        try {
-            const { data } = await axios.get(GET_Admin_URL, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            setAllAdmin(data);
-        } catch (error) {
-            console.error('Error fetching Admins:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    const { allUsers, allAdmins, allTeachers, loading, fetchAllUsers, fetchAllAdmins, error, fetchAllTeachers } = useAdminStore();
+    const navigate = useNavigate();
     useEffect(() => {
-        fetchUsers();
-        fetchAdmins();
-    }, []);
+        fetchAllUsers();
+        fetchAllAdmins();
+        fetchAllTeachers();
+    }, [fetchAllUsers, fetchAllAdmins, fetchAllTeachers]);
 
-    if (loading) return <p>Loading users...</p>;
+    if (loading) return <p>Loading data...</p>;
+    if (error) return <p style={{ color: 'red' }}>{error}</p>;
+
+    const handleLogout = () => {
+        useAuthStore.getState().logout();
+        useAdminStore.getState().logout();
+        localStorage.clear();
+        navigate('/login');
+    }
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1>Admin Dashboard: All Users and Admin</h1>
-            <div style={{display:'flex',justifyContent:'space-between'}}>
-                <div>
-                    <table border={1} style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {/* 4. Map through the users and display them */}
-                            {allUser && allUser.length > 0 ? (
-                                allUser.map((user: any, index: number) => (
-                                    <tr key={user._id || index}>
-                                        <td>{user.role}</td>
-                                        <td>{user.firstName}</td>
-                                        <td>{user.lastName}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.phoneNumber || 'N/A'}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={4} style={{ textAlign: 'center' }}>Nothing to display</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                <div>
-                    <table border={1} style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {/* 4. Map through the users and display them */}
-                            {allAdmin && allAdmin.length > 0 ? (
-                                allAdmin.map((admin: any, index: number) => (
-                                    <tr key={admin._id || index}>
-                                        <td>{admin.role}</td>
-                                        <td>{admin.firstName}</td>
-                                        <td>{admin.lastName}</td>
-                                        <td>{admin.email}</td>
-                                        <td>{admin.phoneNumber || 'N/A'}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={4} style={{ textAlign: 'center' }}>Nothing to display</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+            <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <h1>Admin Dashboard</h1>
+                <button onClick={handleLogout} >Logout</button>
+            </span>
+            <div>
+
+                {/* User Table Section */}
+                <TableSection title="All Users" data={allUsers} />
+
+                {/* Admin Table Section */}
+                <TableSection title="All Admins" data={allAdmins} />
+
+                {/* Teacher Table Section */}
+                <TableSection title="All Teachers" data={allTeachers} />
             </div>
+            <RegisterTeacher />
         </div>
-    )
+    );
 }
 
-export default AdminPage
+// 3. Helper Component to keep the code DRY (Don't Repeat Yourself)
+const TableSection = ({ title, data }: { title: string, data: any[] }) => (
+    <div style={{ flex: 1 }}>
+        <h3>{title}</h3>
+        <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {data.length > 0 ? data.map((item) => (
+                    <tr key={item._id}>
+                        <td>{item.role}</td>
+                        <td>{item.firstName} {item.lastName}</td>
+                        <td>{item.email}</td>
+                    </tr>
+                )) : <tr><td colSpan={3}>No data found</td></tr>}
+            </tbody>
+        </table>
+    </div>
+);
+
+export default AdminPage;

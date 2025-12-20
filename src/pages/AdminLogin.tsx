@@ -5,13 +5,11 @@ export interface FormLoginData {
 import { useState, type FormEvent, type ChangeEvent } from 'react';
 import axios from 'axios';
 import { Button, FormControl, Input, InputLabel } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
+import { baseURL } from '../routes/AppRoutes';
+import {useAuthStore} from '../store/useAuthStore'
 function AdminLogin() {
-
-    const API_URL = 'http://localhost:5000/api/admin/login';
-
+    const {setToken, setUser} = useAuthStore();
     const [loginData, setLoginData] = useState<FormLoginData>({
         email: '',
         password: '',
@@ -36,22 +34,13 @@ function AdminLogin() {
 
         try {
             // Send email and password to the backend
-            const response = await axios.post(API_URL, loginData);
-
-            const { token, firstName, email } = response.data;
-
-            // Store the JWT in local storage
-            localStorage.setItem('token', token);
-            localStorage.setItem('_id', JSON.stringify(response.data._id));
-            localStorage.setItem('data', JSON.stringify(response.data));
-            setMessage(`Welcome back, ${firstName}! You are now logged in.`);
+            const response = await axios.post(`${baseURL}/admin/login`, loginData);
+            const { token, user } = response.data;
+            setToken(token);
+            setUser(user);
+            // setMessage(`Welcome back, ${user.data.firstName}! You are now logged in.`);
             setIsError(false);
-
-            // Redirect the user or update global state
-            console.log('User Data:', response);
-
             navigate('/admin/dashboard');
-
         } catch (error) {
             console.error('Login failed:', error);
 
@@ -86,8 +75,6 @@ function AdminLogin() {
                 <Button type="submit" style={{ backgroundColor: "green", color: "black" }}>
                     Log In
                 </Button> <br /><br />
-                {/* <b >Not a member? <Link to="/register" style={{ font: "15px", color: "black" }}>Register</Link></b> <br /><br /> */}
-                {/* <b ><Link to="/admin" style={{ font: "15px", color: "black" }}>Admin Login</Link></b> */}
             </form>
         </section>
     )

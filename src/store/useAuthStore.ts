@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { type UserDetails } from '../components/MainPage'
+import { type UserDetails } from '../pages/Dashboard'
 
 interface AuthState {
     user: UserDetails | null;
@@ -21,7 +21,6 @@ export const useAuthStore = create<AuthState>()(
             setToken: (token) => set({ token }),
             logout: () => {
                 set({ user: null, token: null });
-                localStorage.removeItem('token'); // Clean up
             },
             updateDemoStatus: (status, slot) =>
                 set((state) => ({
