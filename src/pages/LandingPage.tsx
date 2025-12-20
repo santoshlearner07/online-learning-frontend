@@ -14,15 +14,8 @@ function LandingPage() {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             ITB
                         </Typography>
-                        <Link to="/login">
-                            <Button color="inherit">Login</Button>/
-                        </Link>
-                        <Link to="/register">
-                            <Button color="inherit">Register</Button>
-                        </Link>
                     </Toolbar>
                 </AppBar>
-                
             </Box>
         </>
     )

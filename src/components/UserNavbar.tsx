@@ -15,7 +15,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { Link, useNavigate } from 'react-router-dom';
 import './UserNavbar.scss'
 import Profile from './Profile';
-
+import { useAuthStore } from '../store/useAuthStore'
 
 const pages = [
   { name: 'Dashboard', path: '/main/' },
@@ -28,6 +28,7 @@ const settings = [
 ];
 
 function UserNavbar() {
+  const { token } = useAuthStore();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
@@ -46,9 +47,6 @@ function UserNavbar() {
     setAnchorElUser(null);
   };
 
-  // State for the Settings Dropdown Menu visibility
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
   // State for the Modal visibility
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -56,11 +54,9 @@ function UserNavbar() {
   const [selectedSetting, setSelectedSetting] = React.useState(null);
 
   const handleSettingClick = (settingName: any) => {
-    // 1. Capture the setting and open the modal
     setSelectedSetting(settingName);
     setIsModalOpen(true);
 
-    // 2. Close the dropdown menu
     handleCloseUserMenu();
   };
 
@@ -69,9 +65,9 @@ function UserNavbar() {
     setSelectedSetting(null);
   };
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
     localStorage.clear();
-   navigate('/login') 
+    navigate('/login')
   }
 
   return (
@@ -156,46 +152,59 @@ function UserNavbar() {
             {pages.map((page, index) => (
               <Button
                 key={index}
-                
+
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <Link to={page.path}>{page.name}</Link>
+                {token && <Link to={page.path}>{page.name}</Link>}
               </Button>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            {/* <Button className='hide-on-mobile' color='warning' variant='contained' style={{marginRight:"10px"}} onClick={handleOpen}>Book a Free Trial</Button> */}
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }} onClick={() => handleSettingClick(setting)}>
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+          {token ? (
+            <Box sx={{ flexGrow: 0 }}>
+              {/* <Button className='hide-on-mobile' color='warning' variant='contained' style={{marginRight:"10px"}} onClick={handleOpen}>Book a Free Trial</Button> */}
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography sx={{ textAlign: 'center' }} onClick={() => handleSettingClick(setting)}>
+                      {setting}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          ) : (
+            <div>
+              <Link to="/login">
+                <Button color="inherit">Login</Button>/
+              </Link>
+              <Link to="/register">
+                <Button color="inherit">Register</Button>
+              </Link>
+            </div>
+          )}
+
+
         </Toolbar>
       </Container>
       {isModalOpen && (
@@ -210,7 +219,7 @@ function UserNavbar() {
               </div>
             )}
             {selectedSetting === 'Account' && (
-              <p style={{color:"black"}} >Under Maintenance!!!</p>
+              <p style={{ color: "black" }} >Under Maintenance!!!</p>
             )}
             {selectedSetting === 'Logout' && (
               <div style={{ color: "black" }}>
@@ -220,7 +229,6 @@ function UserNavbar() {
                 </Button>
               </div>
             )}
-
             <button onClick={handleModalClose}>Close</button>
           </div>
         </div>

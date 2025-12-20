@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import LandingPage from '../pages/LandingPage'
 import Register from '../pages/Register'
 import Login from '../pages/Login'
 import MainPage from '../components/MainPage'
@@ -16,11 +15,10 @@ function AppRoutes() {
         <div>
             <BrowserRouter>
                 <Routes>
-                    <Route path='/' element={<LandingPage />} />
+                    <Route path='/' element={<MainPage />} />
                     <Route path='/register' element={<Register />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/main' element={<MainPage />} >
-                        {/* These render inside the <Outlet /> of MainLayout */}
                         <Route index element={<Dashboard />} /> {/* Path: /main/ */}
                         <Route path="courses" element={<Courses />} /> {/* Path: /main/courses/ */}
                         <Route path="support" element={<Support />} /> {/* Path: /main/support/ */}
@@ -28,8 +26,6 @@ function AppRoutes() {
                     <Route path='/admin' element={<AdminLogin />} />
                     <Route path='/adminregister' element={<AdminRegister />} />
                     <Route path='/admin/dashboard' element={<AdminPage />} />
-                    {/* <Route path='/main/courses/' element={<Courses />} /> */}
-                    {/* <Route path='/main/support/' element={<Support />} /> */}
                 </Routes>
             </BrowserRouter>
         </div>
