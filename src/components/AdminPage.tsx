@@ -3,7 +3,7 @@ import { useAdminStore } from '../store/useAdminStore';
 import RegisterTeacher from '../pages/RegisterTeacher';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
-
+import AllocateStudent from '../components/AllocateStudent'
 function AdminPage() {
     const { allUsers, allAdmins, allTeachers, loading, fetchAllUsers, fetchAllAdmins, error, fetchAllTeachers } = useAdminStore();
     const navigate = useNavigate();
@@ -32,7 +32,7 @@ function AdminPage() {
             <div>
 
                 {/* User Table Section */}
-                <TableSection title="All Users" data={allUsers} />
+                <TableSection title="All Student" data={allUsers} />
 
                 {/* Admin Table Section */}
                 <TableSection title="All Admins" data={allAdmins} />
@@ -40,6 +40,16 @@ function AdminPage() {
                 {/* Teacher Table Section */}
                 <TableSection title="All Teachers" data={allTeachers} />
             </div>
+            {allUsers.filter(u => u.demoStatus === 'SCHEDULED').map(user => (
+                <div key={user._id}>
+                    <h3>{user.firstName} - Needs {user.subject}</h3>
+                    <AllocateStudent
+                        studentId={user._id}
+                        studentSubject={user.subject}
+                        currentTeacherId={typeof user.teacher === 'object' ? user.teacher?._id : user.teacher}
+                    />
+                </div>
+            ))}
             <RegisterTeacher />
         </div>
     );

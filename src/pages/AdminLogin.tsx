@@ -4,19 +4,19 @@ export interface FormLoginData {
 
 import { useState, type FormEvent, type ChangeEvent } from 'react';
 import axios from 'axios';
-import { Button, FormControl, Input, InputLabel } from '@mui/material';
+import { Button, FormControl, Input, InputLabel, Switch, FormControlLabel, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { baseURL } from '../routes/AppRoutes';
-import {useAuthStore} from '../store/useAuthStore'
+import { useAuthStore } from '../store/useAuthStore'
 function AdminLogin() {
-    const {setToken, setUser} = useAuthStore();
+    const { setToken, setUser } = useAuthStore();
     const [loginData, setLoginData] = useState<FormLoginData>({
         email: '',
         password: '',
     });
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
-
+    const [isAdminForm, setIsAdminForm] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -32,22 +32,23 @@ function AdminLogin() {
         setMessage('Logging in...');
         setIsError(false);
 
+        // ⭐️ Determine endpoint based on toggle state
+        const endpoint = isAdminForm ? `${baseURL}/admin/login` : `${baseURL}/teacher/login`;
+
         try {
-            // Send email and password to the backend
-            const response = await axios.post(`${baseURL}/admin/login`, loginData);
+            const response = await axios.post(endpoint, loginData);
             const { token, user } = response.data;
             setToken(token);
             setUser(user);
-            // setMessage(`Welcome back, ${user.data.firstName}! You are now logged in.`);
-            setIsError(false);
-            navigate('/admin/dashboard');
+
+            // ⭐️ Navigate based on role
+            navigate(isAdminForm ? '/admin/dashboard' : '/teacher/dashboard');
         } catch (error) {
             console.error('Login failed:', error);
-
             if (axios.isAxiosError(error) && error.response) {
                 setMessage(error.response.data.msg || 'Login failed.');
             } else {
-                setMessage('Network error. Could not connect to the server.');
+                setMessage('Network error.');
             }
             setIsError(true);
         }
@@ -55,26 +56,53 @@ function AdminLogin() {
 
     return (
         <section className='loginSection'>
+            <Box sx={{ mb: 2, textAlign: 'center' }}>
+                {/* ⭐️ The Toggle Switch */}
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={isAdminForm}
+                            onChange={() => {
+                                setIsAdminForm(!isAdminForm);
+                                setMessage(''); // Clear messages on switch
+                            }}
+                            color="success"
+                        />
+                    }
+                    label={isAdminForm ? "Admin Access" : "Teacher Access"}
+                />
+            </Box>
 
             <form onSubmit={handleSubmit}>
-                <h1>Admin Login</h1>
+                <h1>{isAdminForm ? 'Admin Login' : 'Teacher Login'}</h1>
 
                 {message && (
                     <div style={{ color: isError ? 'red' : 'green', margin: '10px 0' }}>
-                        **{message}**
+                        {message}
                     </div>
                 )}
-                <FormControl className='form-control'>
+
+                <FormControl className='form-control' fullWidth sx={{ mb: 2 }}>
                     <InputLabel htmlFor="email">Email</InputLabel>
                     <Input id="email" type="email" name="email" value={loginData.email} onChange={handleChange} required />
                 </FormControl>
-                <FormControl>
+
+                <FormControl fullWidth sx={{ mb: 3 }}>
                     <InputLabel htmlFor="password">Password</InputLabel>
                     <Input id="password" type="password" name="password" value={loginData.password} onChange={handleChange} required />
-                </FormControl> <br /><br />
-                <Button type="submit" style={{ backgroundColor: "green", color: "black" }}>
-                    Log In
-                </Button> <br /><br />
+                </FormControl>
+
+                <Button
+                    type="submit"
+                    fullWidth
+                    style={{
+                        backgroundColor: isAdminForm ? "green" : "#1976d2",
+                        color: "white",
+                        fontWeight: 'bold'
+                    }}
+                >
+                    Log In as {isAdminForm ? 'Admin' : 'Teacher'}
+                </Button>
             </form>
         </section>
     )

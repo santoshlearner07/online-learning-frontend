@@ -10,6 +10,7 @@ import AdminLogin from '../pages/AdminLogin'
 import AdminRegister from '../pages/AdminRegister'
 import AdminPage from '../components/AdminPage'
 import Dashboard from '../pages/Dashboard'
+import TeacherDashboard from '../pages/TeacherDashboard'
 
 function AppRoutes() {
     return (
@@ -28,6 +29,7 @@ function AppRoutes() {
                     <Route path='/admin' element={<AdminLogin />} />
                     <Route path='/adminregister' element={<AdminRegister />} />
                     <Route path='/admin/dashboard' element={<AdminPage />} />
+                    <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
                 </Routes>
             </BrowserRouter>
         </div>
