@@ -38,7 +38,15 @@ function Courses() {
                   Time: {new Date(cls.startTime).toLocaleString()}
                 </Typography>
                 {cls.meetingLink && (
-                  <Button href={cls.meetingLink} target="_blank">Join Class</Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    href={cls.meetingLink}
+                    target="_blank"
+                    disabled={new Date() < new Date(new Date(cls.startTime).getTime() - 10 * 60000)} // Enable 10 mins before
+                  >
+                    Join Class
+                  </Button>
                 )}
               </CardContent>
             </Card>
@@ -62,7 +70,7 @@ function Courses() {
                       </Typography>
 
                       <Box sx={{ my: 1 }}>
-                        {lvl.topics.map((topic,index) => (
+                        {lvl.topics.map((topic, index) => (
                           <Chip
                             key={`${topic}-${index}`}
                             label={topic}
