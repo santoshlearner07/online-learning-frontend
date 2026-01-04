@@ -37,7 +37,6 @@ function Login() {
         setIsError(false);
 
         try {
-            // Send email and password to the backend
             const response = await axios.post(API_URL, loginData);
 
             const { token, firstName, user } = response.data;
@@ -47,7 +46,6 @@ function Login() {
             setMessage(`Welcome back, ${firstName}! You are now logged in.`);
             setIsError(false);
 
-            // Redirect the user or update global state
             console.log('User Data:', response);
 
             navigate('/main');

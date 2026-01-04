@@ -77,7 +77,6 @@ function Dashboard() {
           }
         }
       }, [token])
-    // console.log(user)
       const style = {
         position: 'absolute',
         top: '50%',

@@ -32,7 +32,6 @@ function AdminLogin() {
         setMessage('Logging in...');
         setIsError(false);
 
-        // ⭐️ Determine endpoint based on toggle state
         const endpoint = isAdminForm ? `${baseURL}/admin/login` : `${baseURL}/teacher/login`;
 
         try {
@@ -41,7 +40,6 @@ function AdminLogin() {
             setToken(token);
             setUser(user);
 
-            // ⭐️ Navigate based on role
             navigate(isAdminForm ? '/admin/dashboard' : '/teacher/dashboard');
         } catch (error) {
             console.error('Login failed:', error);
@@ -57,14 +55,13 @@ function AdminLogin() {
     return (
         <section className='loginSection'>
             <Box sx={{ mb: 2, textAlign: 'center' }}>
-                {/* ⭐️ The Toggle Switch */}
                 <FormControlLabel
                     control={
                         <Switch
                             checked={isAdminForm}
                             onChange={() => {
                                 setIsAdminForm(!isAdminForm);
-                                setMessage(''); // Clear messages on switch
+                                setMessage(''); 
                             }}
                             color="success"
                         />

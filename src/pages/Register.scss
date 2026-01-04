@@ -1,7 +1,5 @@
 .register {
     background: linear-gradient(aqua,blue);
-    // width: 100%;
-    // height: 100vh;
 
     .secondGrid {
         background-color: rgba(0, 255, 255, 0.5);
@@ -9,7 +7,6 @@
         z-index: 1000;
         display: flex;
         justify-content: center;
-        // align-items: center;
 
         form {
             z-index: 1001;

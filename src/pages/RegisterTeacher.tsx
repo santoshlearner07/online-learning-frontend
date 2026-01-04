@@ -24,7 +24,6 @@ const RegisterTeacher: React.FC = () => {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
-        // Handle numeric fields separately
         const isNumeric = name === 'experience' || name === 'phoneNumber';
 
         setFormData(prev => ({

@@ -1,6 +1,3 @@
-// export interface UserDetails {
-//     firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number;
-// }
 
 import { Box, Button, TextField } from '@mui/material'
 import axios from 'axios';
@@ -56,7 +53,7 @@ function Profile() {
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`, // 
+                    Authorization: `Bearer ${token}`,  
                 },
             };
 

@@ -51,7 +51,6 @@ function AdminRegister() {
         }
         try {
             const response = await axios.post(baseUrl, formData);
-            // const response1 = await axios.post('http://localhost:5000/api/register', formData);
             setMessage(response.data.msg || 'Registration successful!');
             setIsError(false);
 

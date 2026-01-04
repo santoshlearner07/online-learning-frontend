@@ -82,7 +82,6 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // After successful allocation, refresh the lists to show updated links
             await get().fetchAllUsers();
             await get().fetchAllTeachers();
 
@@ -94,23 +93,44 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         }
     },
     deallocateTeacher: async (teacherId: string, studentId: string) => {
-    const token = useAuthStore.getState().token;
-    set({ loading: true });
-    try {
-        await axios.put(`${baseURL}/admin/deallocate`, 
-            { teacherId, studentId }, 
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        // Refresh local state to reflect the removal
-        const { fetchAllUsers, fetchAllTeachers } = get();
-        await Promise.all([fetchAllUsers(), fetchAllTeachers()]);
-        
-        set({ error: null });
-    } catch (err: any) {
-        set({ error: err.response?.data?.msg || 'Deallocation failed' });
-    } finally {
-        set({ loading: false });
-    }
-},
+        const token = useAuthStore.getState().token;
+        set({ loading: true });
+        try {
+            await axios.put(`${baseURL}/admin/deallocate`,
+                { teacherId, studentId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const { fetchAllUsers, fetchAllTeachers } = get();
+            await Promise.all([fetchAllUsers(), fetchAllTeachers()]);
+
+            set({ error: null });
+        } catch (err: any) {
+            set({ error: err.response?.data?.msg || 'Deallocation failed' });
+        } finally {
+            set({ loading: false });
+        }
+    },
+    scheduleClass: async (payload: {
+        studentId: string;
+        teacherId: string;
+        subject: string;
+        startTime: string;
+        durationInMinutes: number
+    }) => {
+        const token = useAuthStore.getState().token;
+        set({ loading: true });
+        try {
+            await axios.post(`${baseURL}/admin/schedule-class`, payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            set({ error: null });
+            return true; 
+        } catch (err: any) {
+            set({ error: err.response?.data?.msg || 'Scheduling failed' });
+            return false;
+        } finally {
+            set({ loading: false });
+        }
+    },
 }));

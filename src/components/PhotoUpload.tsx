@@ -20,7 +20,7 @@ const PhotoUpload: React.FC = () => {
         const file = event.target.files?.[0];
         if (file) {
             setSelectedFile(file);
-            setLocalPreview(URL.createObjectURL(file)); // Better than FileReader for simple previews
+            setLocalPreview(URL.createObjectURL(file));
         }
     };
 
@@ -30,7 +30,7 @@ const PhotoUpload: React.FC = () => {
         setUploading(true);
         const formData = new FormData();
         formData.append('profileImage', selectedFile);
-        formData.append('id', user.email); // or user._id if you have it
+        formData.append('id', user.email);
 
         try {
             const response = await axios.post(API_UPLOAD_URL, formData, {
@@ -40,7 +40,7 @@ const PhotoUpload: React.FC = () => {
             const serverPath = response.data.filePath;
             
             updateProfileImage(serverPath);
-            setLocalPreview(null); // Clear local preview
+            setLocalPreview(null);
             setSelectedFile(null);
             alert('Profile picture updated!');
         } catch (error) {

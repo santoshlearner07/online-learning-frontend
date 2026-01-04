@@ -47,10 +47,8 @@ function UserNavbar() {
     setAnchorElUser(null);
   };
 
-  // State for the Modal visibility
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  // State to track which setting was clicked
   const [selectedSetting, setSelectedSetting] = React.useState(null);
 
   const handleSettingClick = (settingName: any) => {

@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>()(
                 })),
         }),
         {
-            name: 'auth-storage', // This automatically syncs state with LocalStorage!
+            name: 'auth-storage', 
         }
     )
 );

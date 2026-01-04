@@ -26,7 +26,7 @@ const AllocateStudent: React.FC<AllocateProps> = ({ studentId, currentTeacherId,
         const confirmClear = window.confirm("Are you sure you want to remove this teacher?");
         if (confirmClear) {
             await deallocateTeacher(currentTeacherId, studentId);
-            setSelectedTeacher(''); // Reset local dropdown state
+            setSelectedTeacher('');
         }
     };
 
