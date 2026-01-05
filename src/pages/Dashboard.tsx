@@ -1,5 +1,6 @@
 export interface UserDetails {
   firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; demoStatus: string; demoSlot: string; subject: string; profileImagePath:string
+  paymentReference:string; paymentStatus:string;
 }
 export interface DemoBookingData {
   subject: string;

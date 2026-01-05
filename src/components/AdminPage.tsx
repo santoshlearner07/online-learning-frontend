@@ -6,9 +6,17 @@ import { useNavigate } from 'react-router-dom';
 import AllocateStudent from '../components/AllocateStudent'
 import { Box, Typography } from '@mui/material';
 import AdminScheduler from './AdminScheduler';
+import { AdminPayment } from '../pages/AdminPayment';
 function AdminPage() {
     const { allUsers, allAdmins, allTeachers, loading, fetchAllUsers, fetchAllAdmins, error, fetchAllTeachers } = useAdminStore();
     const navigate = useNavigate();
+    const refreshData = async () => {
+        await Promise.all([
+            fetchAllUsers(),
+            fetchAllAdmins(),
+            fetchAllTeachers()
+        ]);
+    };
     useEffect(() => {
         fetchAllUsers();
         fetchAllAdmins();
@@ -42,28 +50,35 @@ function AdminPage() {
                 {/* Teacher Table Section */}
                 <TableSection title="All Teachers" data={allTeachers} />
             </div>
-{allUsers.map((user) => (
-    <Box key={user._id} sx={{ mb: 4, p: 3, border: '1px solid #eee' }}>
-        <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
-        
-        {/* 1. Allocate the teacher first */}
-        <AllocateStudent 
-            studentId={user._id} 
-            studentSubject={user.subject} 
-            currentTeacherId={user.teacher?._id || user.teacher} 
-        />
+            <Box sx={{ mb: 4, p: 2, bgcolor: '#fffde7', borderRadius: 2, border: '1px solid #fbc02d' }}>
+                <Typography variant="h5" sx={{ mb: 2 }}>💳 Pending Verifications</Typography>
+                <AdminPayment 
+                    students={allUsers} 
+                    refreshData={refreshData} 
+                />
+            </Box>
+            {allUsers.map((user) => (
+                <Box key={user._id} sx={{ mb: 4, p: 3, border: '1px solid #eee' }}>
+                    <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
 
-        {/* 2. If a teacher is assigned, show the scheduling box */}
-        {(user.teacher) && (
-            <AdminScheduler 
-                studentId={user._id}
-                teacherId={user.teacher?._id || user.teacher}
-                studentSubject={user.subject}
-            />
-        )}
-    </Box>
-))}
-            
+                    {/* 1. Allocate the teacher first */}
+                    <AllocateStudent
+                        studentId={user._id}
+                        studentSubject={user.subject}
+                        currentTeacherId={user.teacher?._id || user.teacher}
+                    />
+
+                    {/* 2. If a teacher is assigned, show the scheduling box */}
+                    {(user.teacher) && (
+                        <AdminScheduler
+                            studentId={user._id}
+                            teacherId={user.teacher?._id || user.teacher}
+                            studentSubject={user.subject}
+                        />
+                    )}
+                </Box>
+            ))}
+
             <RegisterTeacher />
         </div>
     );

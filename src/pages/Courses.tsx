@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, Divider, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, Divider, Grid, Paper, Typography } from '@mui/material';
 import { useAuthStore } from '../store/useAuthStore';
 import { curriculum } from '../components/Curriculum';
 import { useEffect, useState } from 'react';
@@ -6,7 +6,7 @@ import axios from 'axios';
 import { baseURL } from '../routes/AppRoutes';
 
 function Courses() {
-  const { user, token } = useAuthStore();
+  const { user, token,refreshUser } = useAuthStore();
   const [upcoming, setUpcoming] = useState([]);
   useEffect(() => {
     const fetchClasses = async () => {
@@ -16,18 +16,36 @@ function Courses() {
       setUpcoming(data);
     };
     fetchClasses();
+    refreshUser();
   }, []);
-
+console.log(user)
   return (
     <section>
-      {token ? (<p style={{ fontSize: "35px" }}> Your 1 hour class is <b>{user?.demoStatus}</b> on <b>{user?.demoSlot}</b> of <b>{user?.subject}</b> class. <br />Enjoy it.
+      {(user?.demoStatus==="SCHEDULED") ? (<p style={{ fontSize: "35px" }}> Your 1 hour class is <b>{user?.demoStatus}</b> on <b>{user?.demoSlot}</b> of <b>{user?.subject}</b> class. <br />Enjoy it.
       </p>) : (<span></span>)}
       <Box sx={{ flexGrow: 1, p: 4 }}>
         <Typography variant="h3" gutterBottom align="center">
           Developer Roadmap 2025
         </Typography>
 
-        <Box>
+        {(user?.paymentStatus === 'PENDING') &&(<Box sx={{ p: 4, textAlign: 'center', mt: 10 }}>
+          <Paper elevation={3} sx={{ p: 5, borderRadius: 3, bgcolor: '#fff9c4' }}>
+            <Typography variant="h4" gutterBottom>⏳ Verification Pending</Typography>
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              We've received your payment reference: <strong>{user?.paymentReference}</strong>.
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Our admin team in the UK is verifying the bank transfer.
+              Usually, this takes 2–12 hours. You will get access to your
+              <b> {user?.subject}</b> course once confirmed.
+            </Typography>
+            <Button variant="outlined" sx={{ mt: 3 }} onClick={() => window.location.reload()}>
+              Refresh Status
+            </Button>
+          </Paper>
+        </Box>)}
+
+        {(user?.paymentStatus === 'PAID') &&(<Box>
           <Typography variant="h5">Upcoming Classes</Typography>
           {upcoming.map((cls: any) => (
             <Card key={cls._id} sx={{ mb: 2, borderLeft: '5px solid green' }}>
@@ -51,7 +69,7 @@ function Courses() {
               </CardContent>
             </Card>
           ))}
-        </Box>
+        </Box>)}
 
         <Grid container spacing={4}>
           {curriculum.map((tech) => (
