@@ -6,7 +6,7 @@ import axios from 'axios';
 import { baseURL } from '../routes/AppRoutes';
 
 function Courses() {
-  const { user, token,refreshUser } = useAuthStore();
+  const { user, token, refreshUser } = useAuthStore();
   const [upcoming, setUpcoming] = useState([]);
   useEffect(() => {
     const fetchClasses = async () => {
@@ -18,17 +18,28 @@ function Courses() {
     fetchClasses();
     refreshUser();
   }, []);
+const now = new Date();
 console.log(user)
   return (
     <section>
-      {(user?.demoStatus==="SCHEDULED") ? (<p style={{ fontSize: "35px" }}> Your 1 hour class is <b>{user?.demoStatus}</b> on <b>{user?.demoSlot}</b> of <b>{user?.subject}</b> class. <br />Enjoy it.
-      </p>) : (<span></span>)}
+
+      {user?.demoSlot && new Date(user.demoSlot) > now && (
+                <Paper sx={{ p: 2, mb: 3, bgcolor: '#e3f2fd' }}>
+                    <Typography variant="h6">Upcoming Demo {user.subject}</Typography>
+                    <Typography>{new Date(user.demoSlot).toLocaleString()}</Typography>
+                   {!user?.subject && (
+                <Typography variant="caption" color="error">
+                    Note: Subject not specified. Please contact admin.
+                </Typography>
+            )}
+                </Paper>
+            )}
       <Box sx={{ flexGrow: 1, p: 4 }}>
         <Typography variant="h3" gutterBottom align="center">
           Developer Roadmap 2025
         </Typography>
 
-        {(user?.paymentStatus === 'PENDING') &&(<Box sx={{ p: 4, textAlign: 'center', mt: 10 }}>
+        {(user?.paymentStatus === 'AWAITING_VERIFICATION') && (<Box sx={{ p: 4, textAlign: 'center', mt: 10 }}>
           <Paper elevation={3} sx={{ p: 5, borderRadius: 3, bgcolor: '#fff9c4' }}>
             <Typography variant="h4" gutterBottom>⏳ Verification Pending</Typography>
             <Typography variant="body1" sx={{ mb: 3 }}>
@@ -45,7 +56,7 @@ console.log(user)
           </Paper>
         </Box>)}
 
-        {(user?.paymentStatus === 'PAID') &&(<Box>
+        {(user?.paymentStatus === 'PAID') && (<Box>
           <Typography variant="h5">Upcoming Classes</Typography>
           {upcoming.map((cls: any) => (
             <Card key={cls._id} sx={{ mb: 2, borderLeft: '5px solid green' }}>

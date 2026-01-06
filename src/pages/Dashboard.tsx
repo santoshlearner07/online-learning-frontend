@@ -17,7 +17,7 @@ function Dashboard() {
       const API_PROFILE_URL = 'http://localhost:5000/api/profile';
     
       const [open, setOpen] = React.useState(false);
-      const { user, token, updateDemoStatus, setUser, setToken } = useAuthStore();
+      const { user, token, updateDemoStatus, setUser, setToken,refreshUser } = useAuthStore();
       const [formData, setFormData] = useState<DemoBookingData>({
         subject: '',
         preferredDate: '',
@@ -33,7 +33,7 @@ function Dashboard() {
         const combinedDateTime = new Date(`${formData.preferredDate}T${formData.preferredTime}`);
         try {
           
-          await axios.put(API_URL,
+         const response= await axios.put(API_URL,
             { demoSlot: combinedDateTime, subject: formData.subject },
             {
               headers: {
@@ -43,6 +43,7 @@ function Dashboard() {
           )
           updateDemoStatus('SCHEDULED', combinedDateTime.toISOString());
           alert('Demo Booked Successfully!');
+          useAuthStore.setState({ user: response.data });
           handleClose();
         } catch (err) {
           console.error('Booking failed', err);
