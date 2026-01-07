@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import AllocateStudent from '../components/AllocateStudent'
 import { Box, Typography } from '@mui/material';
 import AdminScheduler from './AdminScheduler';
-import { AdminPayment } from '../pages/AdminPayment';
+import { AdminPayment } from '../pages/AdminPaymennt';
+import { AdminDemoManager } from '../pages/AdminDemoManager';
 function AdminPage() {
     const { allUsers, allAdmins, allTeachers, loading, fetchAllUsers, fetchAllAdmins, error, fetchAllTeachers } = useAdminStore();
     const navigate = useNavigate();
@@ -50,6 +51,12 @@ function AdminPage() {
                 {/* Teacher Table Section */}
                 <TableSection title="All Teachers" data={allTeachers} />
             </div>
+            
+            <AdminDemoManager 
+            allUsers={allUsers} // This will now have data
+            allTeachers={allTeachers}
+            refreshData={fetchAllUsers}
+            />
             <Box sx={{ mb: 4, p: 2, bgcolor: '#fffde7', borderRadius: 2, border: '1px solid #fbc02d' }}>
                 <Typography variant="h5" sx={{ mb: 2 }}>💳 Pending Verifications</Typography>
                 <AdminPayment 

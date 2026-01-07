@@ -8,8 +8,8 @@ interface TeacherProfile {
 
 interface TeacherDashboardData {
     profile: TeacherProfile | null;
-    students: any[]; 
-    classes: any[];  
+    students: any[];
+    classes: any[];
 }
 
 import { useEffect, useState } from 'react';
@@ -23,31 +23,56 @@ import { useNavigate } from 'react-router-dom';
 function TeacherDashboard() {
     const { token } = useAuthStore();
     const [data, setData] = useState<TeacherDashboardData>({ profile: null, students: [], classes: [] });
+    const [availableDemos, setAvailableDemos] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-const navigate = useNavigate();
+    const [ignoredIds, setIgnoredIds] = useState<string[]>([]);
+    const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchTeacherData = async () => {
+        const fetchDashboard = async () => {
             try {
                 const response = await axios.get(`${baseURL}/teacher/dashboard-data`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setData(response.data);
+                const demoRes = await axios.get(`${baseURL}/teacher/available-demos`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setAvailableDemos(demoRes.data);
             } catch (err) {
                 console.error("Failed to fetch dashboard data");
             } finally {
                 setLoading(false);
             }
         };
-        fetchTeacherData();
+        fetchDashboard();
     }, [token]);
+
     if (loading) return <Typography>Loading Dashboard...</Typography>;
+    
     const { profile } = data;
-const handleLogout = () => {
+    const filteredDemos = availableDemos.filter(d => !ignoredIds.includes(d._id));
+    
+    const handleLogout = () => {
         useAuthStore.getState().logout();
         useAdminStore.getState().logout();
         localStorage.clear();
         navigate('/login');
     }
+    
+    const handleAccept = async (id: string) => {
+        try {
+            await axios.put(`${baseURL}/teacher/accept-demo/${id}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert("Demo accepted!");
+            fetchDashboard(); // ⭐️ Refresh everything to move student to "My Students"
+        } catch (err) {
+            alert("This demo was already taken!");
+            fetchDashboard();
+        }
+    };
+
     return (
         <Box sx={{ p: 4 }}>
             {/* <Typography variant="h4" gutterBottom>Welcome, {user?.firstName}! 👋</Typography> */}
@@ -118,8 +143,42 @@ const handleLogout = () => {
                     </Paper>
                 </Grid>
             </Grid>
+            <Box>
+                {/* ⭐️ New Section for Available Demos */}
+                {filteredDemos.length > 0 && (
+                    <Paper sx={{ p: 3, mb: 3, bgcolor: '#fffde7', border: '1px solid #fbc02d' }}>
+                        <Typography variant="h6" color="warning.dark">🔔 New Demo Requests</Typography>
+                        <Typography variant="body2" sx={{ mb: 2 }}>These students are looking for a trial session:</Typography>
+                        <Grid container spacing={2}>
+                            {filteredDemos.map(student => (
+                                <Grid item xs={12} sm={6} md={4} key={student._id}>
+                                    <Card sx={{ p: 2, borderLeft: '5px solid #fbc02d' }}>
+                                        <Typography fontWeight="bold">{student.firstName} {student.lastName}</Typography>
+                                        <Typography variant="body2">Subject: {student.subject}</Typography>
+                                        <Typography variant="caption" display="block">
+                                            📅 {new Date(student.demoSlot).toLocaleString()}
+                                        </Typography>
+                                        <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                                            <Button size="small" variant="contained" color="success" onClick={() => handleAccept(student._id)}>
+                                                Accept
+                                            </Button>
+                                            <Button size="small" variant="outlined" color="inherit" onClick={() => setIgnoredIds([...ignoredIds, student._id])}>
+                                                Ignore
+                                            </Button>
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Paper>
+                )}
+            </Box>
         </Box>
     );
 }
 
 export default TeacherDashboard;
+
+function fetchDashboard() {
+    throw new Error('Function not implemented.');
+}

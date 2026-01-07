@@ -117,7 +117,7 @@ function Dashboard() {
                     <p>
                       ⭐ No credit/Debit card or Cash required for the demo session.
                     </p>
-                    {user?.demoStatus === 'NOT_SCHEDULED' ? (
+                    {user?.demoStatus === 'PENDING' ? (
                     <div>
                       You have got a 1 Free schdeule left book it as early as possible with your convient time and date.
                       Change this <b>{user?.demoStatus}</b> to Schedule
