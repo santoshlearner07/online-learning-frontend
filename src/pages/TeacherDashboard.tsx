@@ -10,6 +10,7 @@ interface TeacherDashboardData {
     profile: TeacherProfile | null;
     students: any[];
     classes: any[];
+    demos: any[];
 }
 
 import { useEffect, useState } from 'react';
@@ -49,33 +50,50 @@ function TeacherDashboard() {
     }, [token]);
 
     if (loading) return <Typography>Loading Dashboard...</Typography>;
-    
+
     const { profile } = data;
     const filteredDemos = availableDemos.filter(d => !ignoredIds.includes(d._id));
-    
+
     const handleLogout = () => {
         useAuthStore.getState().logout();
         useAdminStore.getState().logout();
         localStorage.clear();
         navigate('/login');
     }
-    
+
     const handleAccept = async (id: string) => {
         try {
             await axios.put(`${baseURL}/teacher/accept-demo/${id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert("Demo accepted!");
             fetchDashboard(); // ⭐️ Refresh everything to move student to "My Students"
+            alert("Demo accepted!");
         } catch (err) {
             alert("This demo was already taken!");
             fetchDashboard();
         }
     };
 
+    const handleComplete = async (studentId: string) => {
+        if (!window.confirm("Are you sure this demo session is finished?")) return;
+
+        try {
+            await axios.put(`${baseURL}/teacher/complete-demo/${studentId}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert("Demo marked as completed!");
+            // Force refresh to remove from list
+            const response = await axios.get(`${baseURL}/teacher/dashboard-data`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setData(response.data);
+        } catch (err) {
+            alert("Failed to update status");
+        }
+    };
+
     return (
         <Box sx={{ p: 4 }}>
-            {/* <Typography variant="h4" gutterBottom>Welcome, {user?.firstName}! 👋</Typography> */}
             <Paper sx={{ p: 3, mb: 3, bgcolor: '#f0f4f8' }}>
                 <Typography variant="h4">Welcome, {profile?.firstName}!</Typography>
                 <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -94,8 +112,59 @@ function TeacherDashboard() {
                 </Grid>
                 <Button onClick={handleLogout}>Logout</Button>
             </Paper>
-
             <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                    {data.demos.length > 0 && (
+                        <Paper sx={{ p: 3, mb: 3, borderLeft: '6px solid #4caf50' }}>
+                            <Typography variant="h6" color="success.main">🤝 Upcoming Accepted Demos</Typography>
+                            <Divider sx={{ my: 1 }} />
+                            <List>
+                                {data.demos.length > 0 ? data.demos.map((demo: any) => (
+                                    <ListItem
+                                        key={demo._id}
+                                        divider
+                                        secondaryAction={
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                color="success"
+                                                onClick={() => handleComplete(demo._id)}
+                                            >
+                                                Completed
+                                            </Button>
+                                        }
+                                    >
+                                        <ListItemText
+                                            primary={`${demo.firstName} ${demo.lastName}`}
+                                            secondary={
+                                                <Typography variant="caption" fontWeight="bold" color="primary">
+                                                    🕒 {new Date(demo.demoSlot).toLocaleString()}
+                                                </Typography>
+                                            }
+                                        />
+                                    </ListItem>
+                                )) : (
+                                    <Typography variant="body2" sx={{ p: 2 }}>No future demos scheduled.</Typography>
+                                )}
+                            </List>
+                        </Paper>
+                    )}
+
+                    <Paper sx={{ p: 3 }}>
+                        <Typography variant="h6" color="secondary">My Regular Students ({data.students.length})</Typography>
+                        <Divider sx={{ my: 1 }} />
+                        <List>
+                            {data.students.map((student: any) => (
+                                <ListItem key={student._id} divider>
+                                    <ListItemText
+                                        primary={student.firstName}
+                                        secondary={`${student.subject} | ${student.phoneNumber}`}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Paper>
+                </Grid>
                 <Grid item xs={12} md={8}>
                     <Paper sx={{ p: 3, minHeight: '400px' }}>
                         <Typography variant="h6" color="primary">Upcoming Classes</Typography>
@@ -125,26 +194,8 @@ function TeacherDashboard() {
                         )}
                     </Paper>
                 </Grid>
-
-                <Grid item xs={12} md={4}>
-                    <Paper sx={{ p: 3 }}>
-                        <Typography variant="h6" color="secondary">My Students ({data.students.length})</Typography>
-                        <Divider sx={{ my: 2 }} />
-                        <List>
-                            {data.students.map((student: any) => (
-                                <ListItem key={student._id} divider>
-                                    <ListItemText
-                                        primary={student.firstName}
-                                        secondary={`${student.subject} | ${student.phoneNumber}`}
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Paper>
-                </Grid>
             </Grid>
             <Box>
-                {/* ⭐️ New Section for Available Demos */}
                 {filteredDemos.length > 0 && (
                     <Paper sx={{ p: 3, mb: 3, bgcolor: '#fffde7', border: '1px solid #fbc02d' }}>
                         <Typography variant="h6" color="warning.dark">🔔 New Demo Requests</Typography>
@@ -179,6 +230,6 @@ function TeacherDashboard() {
 
 export default TeacherDashboard;
 
-function fetchDashboard() {
-    throw new Error('Function not implemented.');
-}
+// function fetchDashboard() {
+//     throw new Error('Function not implemented.');
+// }
