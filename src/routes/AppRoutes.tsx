@@ -21,7 +21,7 @@ function AppRoutes() {
                     <Route path='/' element={<MainPage />} />
                     <Route path='/register' element={<Register />} />
                     <Route path='/login' element={<Login />} />
-                    <Route path='/main' element={<MainPage />} >
+                    <Route path='/' element={<MainPage />} >
                         <Route index element={<Dashboard />} /> {/* Path: /main/ */}
                         <Route path="courses" element={<Courses />} /> {/* Path: /main/courses/ */}
                         <Route path="support" element={<Support />} /> {/* Path: /main/support/ */}

@@ -18,9 +18,9 @@ import Profile from './Profile';
 import { useAuthStore } from '../store/useAuthStore'
 
 const pages = [
-  { name: 'Dashboard', path: '/main/' },
-  { name: 'My Courses', path: '/main/courses/' },
-  { name: 'Support', path: '/main/support/' }
+  { name: 'Dashboard', path: '/' },
+  { name: 'My Courses', path: '/courses/' },
+  { name: 'Support', path: '/support/' }
 ];
 
 const settings = [

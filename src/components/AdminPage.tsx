@@ -1,16 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState, type JSXElementConstructor, type Key, type ReactElement, type ReactNode, type ReactPortal } from 'react';
 import { useAdminStore } from '../store/useAdminStore';
 import RegisterTeacher from '../pages/RegisterTeacher';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import AllocateStudent from '../components/AllocateStudent'
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Paper, Typography } from '@mui/material';
 import AdminScheduler from './AdminScheduler';
 import { AdminPayment } from '../pages/AdminPaymennt';
 import { AdminDemoManager } from '../pages/AdminDemoManager';
+import { Tabs, Tab, TextField, InputAdornment, Chip } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 function AdminPage() {
     const { allUsers, allAdmins, allTeachers, loading, fetchAllUsers, fetchAllAdmins, error, fetchAllTeachers } = useAdminStore();
     const navigate = useNavigate();
+    const [tabValue, setTabValue] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
     const refreshData = async () => {
         await Promise.all([
             fetchAllUsers(),
@@ -18,6 +22,16 @@ function AdminPage() {
             fetchAllTeachers()
         ]);
     };
+
+    const filteredUsers = allUsers.filter(u =>
+        u.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const pendingPayments = allUsers.filter(u => u.paymentStatus === 'AWAITING_VERIFICATION').length;
+    const unclaimedDemos = allUsers.filter(u => u.demoSlot && !u.acceptedBy).length;
+    const leads = allUsers.filter((u: { demoStatus: string; isPaid: string; }) => u.demoStatus === 'COMPLETED' && !u.isPaid);
+
     useEffect(() => {
         fetchAllUsers();
         fetchAllAdmins();
@@ -35,59 +49,91 @@ function AdminPage() {
     }
 
     return (
-        <div style={{ padding: '20px' }}>
-            <span style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <h1>Admin Dashboard</h1>
-                <button onClick={handleLogout} >Logout</button>
-            </span>
-            <div>
-
-                {/* User Table Section */}
-                <TableSection title="All Student" data={allUsers} />
-
-                {/* Admin Table Section */}
-                <TableSection title="All Admins" data={allAdmins} />
-
-                {/* Teacher Table Section */}
-                <TableSection title="All Teachers" data={allTeachers} />
-            </div>
-            
-            <AdminDemoManager 
-            allUsers={allUsers} // This will now have data
-            allTeachers={allTeachers}
-            refreshData={fetchAllUsers}
-            />
-            <Box sx={{ mb: 4, p: 2, bgcolor: '#fffde7', borderRadius: 2, border: '1px solid #fbc02d' }}>
-                <Typography variant="h5" sx={{ mb: 2 }}>💳 Pending Verifications</Typography>
-                <AdminPayment 
-                    students={allUsers} 
-                    refreshData={refreshData} 
-                />
+        <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                <Typography variant="h4">Admin Control Center</Typography>
+                <Button variant="contained" color="error" onClick={handleLogout}>Logout</Button>
             </Box>
-            {allUsers.map((user) => (
-                <Box key={user._id} sx={{ mb: 4, p: 3, border: '1px solid #eee' }}>
-                    <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
 
-                    {/* 1. Allocate the teacher first */}
-                    <AllocateStudent
-                        studentId={user._id}
-                        studentSubject={user.subject}
-                        currentTeacherId={user.teacher?._id || user.teacher}
-                    />
+            {/* ⭐️ SEARCH BAR - Essential for handling many students */}
+            <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Search by student name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{ mb: 3 }}
+                InputProps={{
+                    startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>),
+                }}
+            />
 
-                    {/* 2. If a teacher is assigned, show the scheduling box */}
-                    {(user.teacher) && (
-                        <AdminScheduler
-                            studentId={user._id}
-                            teacherId={user.teacher?._id || user.teacher}
-                            studentSubject={user.subject}
-                        />
-                    )}
+            {/* ⭐️ TABS - Keep your screen clean */}
+            <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ mb: 3 }}>
+                <Tab label={`Demos (${unclaimedDemos})`} />
+                <Tab label={`Payments (${pendingPayments})`} />
+                <Tab label="Manage Classes" />
+                <Tab label="Teacher Database" />
+                <Tab label="Student Database" />
+                <Tab label="Admin Database" />
+                <Tab label="Demo Complete" />
+            </Tabs>
+
+            {/* TAB 0: DEMO MANAGEMENT */}
+            {tabValue === 0 && (
+                <AdminDemoManager allUsers={allUsers} allTeachers={allTeachers} refreshData={fetchAllUsers} />
+            )}
+
+            {/* TAB 1: PAYMENT VERIFICATION */}
+            {tabValue === 1 && (
+                <AdminPayment students={allUsers} refreshData={fetchAllUsers} />
+            )}
+
+            {/* TAB 2: SCHEDULING & ALLOCATION */}
+            {tabValue === 2 && (
+                <Box>
+                    {filteredUsers.map((user) => (
+                        <Paper key={user._id} sx={{ p: 2, mb: 2, borderLeft: user.isPaid ? '5px solid green' : '5px solid red' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
+                                <Chip label={user.isPaid ? "PAID" : "UNPAID"} color={user.isPaid ? "success" : "error"} />
+                            </Box>
+                            <AllocateStudent studentId={user._id} studentSubject={user.subject} currentTeacherId={user.teacher} />
+                            {user.teacher && user.isPaid && <AdminScheduler studentId={user._id} teacherId={user.teacher} studentSubject={user.subject} />}
+                        </Paper>
+                    ))}
                 </Box>
-            ))}
+            )}
 
-            <RegisterTeacher />
-        </div>
+            {/* TAB 3: MASTER TABLES */}
+            {tabValue === 3 && (
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+                    <TableSection title="All Teachers" data={allTeachers} />
+                    <RegisterTeacher />
+                </Box>
+            )}
+            {tabValue === 4 && (
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+                    <TableSection title="All Students" data={allUsers} />
+                </Box>
+            )}
+            {tabValue === 5 && (
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+                    <TableSection title="All Admins" data={allAdmins} />
+                    <RegisterTeacher />
+                </Box>
+            )}
+            {tabValue === 6 && (
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+                    <Paper sx={{ p: 2, mt: 2, bgcolor: '#f1f8e9' }}>
+                        <Typography variant="h6">🎯 Sales Leads (Demos Finished)</Typography>
+                        {leads.map((u: { _id: string; firstName: string; email: string; updatedAt: string | number | Date; }) => (
+                            <Typography key={u._id}>• {u.firstName} ({u.email}) - Completed on {new Date(u.updatedAt).toLocaleDateString()}</Typography>
+                        ))}
+                    </Paper>
+                </Box>
+            )}
+        </Box>
     );
 }
 
@@ -97,14 +143,16 @@ const TableSection = ({ title, data }: { title: string, data: any[] }) => (
         <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
                 <tr>
+                    <th> - -</th>
                     <th>Role</th>
                     <th>Name</th>
                     <th>Email</th>
                 </tr>
             </thead>
             <tbody>
-                {data.length > 0 ? data.map((item) => (
+                {data.length > 0 ? data.map((item, index) => (
                     <tr key={item._id}>
+                        <td>{index + 1}</td>
                         <td>{item.role}</td>
                         <td>{item.firstName} {item.lastName}</td>
                         <td>{item.email}</td>
@@ -112,7 +160,6 @@ const TableSection = ({ title, data }: { title: string, data: any[] }) => (
                 )) : <tr><td colSpan={3}>No data found</td></tr>}
             </tbody>
         </table>
-        {/* <AdminScheduler /> */}
     </div>
 );
 

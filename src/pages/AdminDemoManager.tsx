@@ -3,7 +3,7 @@ import { baseURL } from "../routes/AppRoutes";
 import { Box, Button, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { useAuthStore } from "../store/useAuthStore";
 import { useAdminStore } from "../store/useAdminStore";
-import { useEffect } from "react";
+import { useEffect, type JSXElementConstructor, type Key, type ReactElement, type ReactNode, type ReactPortal } from "react";
 
 export const AdminDemoManager = ({ allUsers, allTeachers, refreshData }: any) => {
     const { token } = useAuthStore();
@@ -43,7 +43,7 @@ export const AdminDemoManager = ({ allUsers, allTeachers, refreshData }: any) =>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {unclaimedDemos.map(student => (
+                        {unclaimedDemos.map((student: { _id: string; firstName: string; subject: string ;demoSlot: string | number | Date; }) => (
                             <TableRow key={student._id}>
                                 <TableCell>{student.firstName}</TableCell>
                                 <TableCell>{student.subject}</TableCell>
