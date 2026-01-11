@@ -10,11 +10,14 @@ import { AdminPayment } from '../pages/AdminPaymennt';
 import { AdminDemoManager } from '../pages/AdminDemoManager';
 import { Tabs, Tab, TextField, InputAdornment, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { TeacherActivityModal } from './TeacherActivityModal';
 function AdminPage() {
     const { allUsers, allAdmins, allTeachers, loading, fetchAllUsers, fetchAllAdmins, error, fetchAllTeachers } = useAdminStore();
     const navigate = useNavigate();
     const [tabValue, setTabValue] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedTeacherId, setSelectedTeacherId] = useState<string | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
     const refreshData = async () => {
         await Promise.all([
             fetchAllUsers(),
@@ -41,6 +44,51 @@ function AdminPage() {
     if (loading) return <p>Loading data...</p>;
     if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
+const TableSection = ({ title, data }: { title: string, data: any[] }) => (
+    <div style={{ flex: 1, marginBottom: '20px' }}>
+        <h3>{title}</h3>
+        <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+                <tr style={{ backgroundColor: '#f4f4f4' }}>
+                    <th>Name</th>
+                    <th>Email</th>
+                    {title === "All Teachers" && <th>Last Active</th>}
+                </tr>
+            </thead>
+            <tbody>
+                {data.map((item) => (
+                    <tr key={item._id}>
+                        <td style={{ padding: '10px' }}>
+                            {title === "All Teachers" ? (
+                                <button
+                                    onClick={() => {
+                                        setSelectedTeacherId(item._id);
+                                        setModalOpen(true);
+                                    }}
+                                    style={{
+                                        background: 'none', border: 'none', color: '#1976d2',
+                                        textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold'
+                                    }}
+                                >
+                                    {item.firstName} {item.lastName}
+                                </button>
+                            ) : (
+                                `${item.firstName} ${item.lastName}`
+                            )}
+                        </td>
+                        <td>{item.email}</td>
+                        {title === "All Teachers" && (
+                            <td style={{ textAlign: 'center' }}>
+                                {item.lastActive ? new Date(item.lastActive).toLocaleString() : 'Never'}
+                            </td>
+                        )}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+);
+
     const handleLogout = () => {
         useAuthStore.getState().logout();
         useAdminStore.getState().logout();
@@ -55,7 +103,6 @@ function AdminPage() {
                 <Button variant="contained" color="error" onClick={handleLogout}>Logout</Button>
             </Box>
 
-            {/* ⭐️ SEARCH BAR - Essential for handling many students */}
             <TextField
                 fullWidth
                 variant="outlined"
@@ -68,7 +115,6 @@ function AdminPage() {
                 }}
             />
 
-            {/* ⭐️ TABS - Keep your screen clean */}
             <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ mb: 3 }}>
                 <Tab label={`Demos (${unclaimedDemos})`} />
                 <Tab label={`Payments (${pendingPayments})`} />
@@ -79,17 +125,14 @@ function AdminPage() {
                 <Tab label="Demo Complete" />
             </Tabs>
 
-            {/* TAB 0: DEMO MANAGEMENT */}
             {tabValue === 0 && (
                 <AdminDemoManager allUsers={allUsers} allTeachers={allTeachers} refreshData={fetchAllUsers} />
             )}
 
-            {/* TAB 1: PAYMENT VERIFICATION */}
             {tabValue === 1 && (
                 <AdminPayment students={allUsers} refreshData={fetchAllUsers} />
             )}
 
-            {/* TAB 2: SCHEDULING & ALLOCATION */}
             {tabValue === 2 && (
                 <Box>
                     {filteredUsers.map((user) => (
@@ -105,7 +148,6 @@ function AdminPage() {
                 </Box>
             )}
 
-            {/* TAB 3: MASTER TABLES */}
             {tabValue === 3 && (
                 <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
                     <TableSection title="All Teachers" data={allTeachers} />
@@ -133,34 +175,18 @@ function AdminPage() {
                     </Paper>
                 </Box>
             )}
+            {selectedTeacherId && (
+            <TeacherActivityModal 
+                teacherId={selectedTeacherId} 
+                open={modalOpen} 
+                onClose={() => {
+                    setModalOpen(false);
+                    setSelectedTeacherId(null);
+                }} 
+            />
+        )}
         </Box>
     );
 }
-
-const TableSection = ({ title, data }: { title: string, data: any[] }) => (
-    <div style={{ flex: 1 }}>
-        <h3>{title}</h3>
-        <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-                <tr>
-                    <th> - -</th>
-                    <th>Role</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                {data.length > 0 ? data.map((item, index) => (
-                    <tr key={item._id}>
-                        <td>{index + 1}</td>
-                        <td>{item.role}</td>
-                        <td>{item.firstName} {item.lastName}</td>
-                        <td>{item.email}</td>
-                    </tr>
-                )) : <tr><td colSpan={3}>No data found</td></tr>}
-            </tbody>
-        </table>
-    </div>
-);
 
 export default AdminPage;
