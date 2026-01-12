@@ -18,22 +18,22 @@ function Courses() {
     fetchClasses();
     refreshUser();
   }, []);
-const now = new Date();
-console.log(user)
+  const now = new Date();
+
   return (
     <section>
 
       {user?.demoSlot && new Date(user.demoSlot) > now && (
-                <Paper sx={{ p: 2, mb: 3, bgcolor: '#e3f2fd' }}>
-                    <Typography variant="h6">Upcoming Demo {user.subject}</Typography>
-                    <Typography>{new Date(user.demoSlot).toLocaleString()}</Typography>
-                   {!user?.subject && (
-                <Typography variant="caption" color="error">
-                    Note: Subject not specified. Please contact admin.
-                </Typography>
-            )}
-                </Paper>
-            )}
+        <Paper sx={{ p: 2, mb: 3, bgcolor: '#e3f2fd' }}>
+          <Typography variant="h6">Upcoming Demo {user.subject}</Typography>
+          <Typography>{new Date(user.demoSlot).toLocaleString()}</Typography>
+          {!user?.subject && (
+            <Typography variant="caption" color="error">
+              Note: Subject not specified. Please contact admin.
+            </Typography>
+          )}
+        </Paper>
+      )}
       <Box sx={{ flexGrow: 1, p: 4 }}>
         <Typography variant="h3" gutterBottom align="center">
           Developer Roadmap 2025

@@ -16,6 +16,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './UserNavbar.scss'
 import Profile from './Profile';
 import { useAuthStore } from '../store/useAuthStore'
+import DeleteUserAccount from './DeleteUserAccount';
 
 const pages = [
   { name: 'Dashboard', path: '/' },
@@ -24,7 +25,7 @@ const pages = [
 ];
 
 const settings = [
-  'Profile', 'Account', 'Logout'
+  'Profile', 'Delete Account', 'Logout'
 ];
 
 function UserNavbar() {
@@ -216,8 +217,8 @@ function UserNavbar() {
                 <Profile />
               </div>
             )}
-            {selectedSetting === 'Account' && (
-              <p style={{ color: "black" }} >Under Maintenance!!!</p>
+            {selectedSetting === 'Delete Account' && (
+              <p style={{ color: "black" }} ><DeleteUserAccount /></p>
             )}
             {selectedSetting === 'Logout' && (
               <div style={{ color: "black" }}>
