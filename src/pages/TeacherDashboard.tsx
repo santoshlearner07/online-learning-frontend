@@ -114,41 +114,48 @@ function TeacherDashboard() {
             </Paper>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
-                    {data.demos.length > 0 && (
-                        <Paper sx={{ p: 3, mb: 3, borderLeft: '6px solid #4caf50' }}>
-                            <Typography variant="h6" color="success.main">🤝 Upcoming Accepted Demos</Typography>
-                            <Divider sx={{ my: 1 }} />
-                            <List>
-                                {data.demos.length > 0 ? data.demos.map((demo: any) => (
+                    {/* {data.demos.length > 0 && ( */}
+                    <Paper sx={{ p: 3, mb: 3, borderLeft: '6px solid #4caf50' }}>
+                        <Typography variant="h6" color="success.main">🤝 Upcoming Accepted Demos</Typography>
+                        <Divider sx={{ my: 1 }} />
+                        <List>
+                            {data.demos.map((demo: any) => {
+                                const demoTime = new Date(demo.demoSlot);
+                                const meetingLink = `https://meet.jit.si/Demo-${demo._id}`;
+
+                                return (
                                     <ListItem
                                         key={demo._id}
                                         divider
-                                        secondaryAction={
+                                    >
+                                        <ListItemText
+                                            primary={`${demo.firstName} - ${demo.subject}`}
+                                            secondary={demoTime.toLocaleString()}
+                                        />
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                href={meetingLink}
+                                                target="_blank"
+                                            >
+                                                Join
+                                            </Button>
                                             <Button
                                                 size="small"
                                                 variant="outlined"
                                                 color="success"
                                                 onClick={() => handleComplete(demo._id)}
                                             >
-                                                Completed
+                                                Complete
                                             </Button>
-                                        }
-                                    >
-                                        <ListItemText
-                                            primary={`${demo.firstName} ${demo.lastName}`}
-                                            secondary={
-                                                <Typography variant="caption" fontWeight="bold" color="primary">
-                                                    🕒 {new Date(demo.demoSlot).toLocaleString()}
-                                                </Typography>
-                                            }
-                                        />
+                                        </Box>
                                     </ListItem>
-                                )) : (
-                                    <Typography variant="body2" sx={{ p: 2 }}>No future demos scheduled.</Typography>
-                                )}
-                            </List>
-                        </Paper>
-                    )}
+                                );
+                            })}
+                        </List>
+                    </Paper>
+                    {/* )} */}
 
                     <Paper sx={{ p: 3 }}>
                         <Typography variant="h6" color="secondary">My Regular Students ({data.students.length})</Typography>
@@ -229,7 +236,3 @@ function TeacherDashboard() {
 }
 
 export default TeacherDashboard;
-
-// function fetchDashboard() {
-//     throw new Error('Function not implemented.');
-// }
