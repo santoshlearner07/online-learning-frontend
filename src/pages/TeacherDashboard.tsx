@@ -23,29 +23,29 @@ import { useNavigate } from 'react-router-dom';
 
 function TeacherDashboard() {
     const { token } = useAuthStore();
-    const [data, setData] = useState<TeacherDashboardData>({ profile: null, students: [], classes: [] });
+    const [data, setData] = useState<TeacherDashboardData>({ profile: null, students: [], classes: [], demos: [] });
     const [availableDemos, setAvailableDemos] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [ignoredIds, setIgnoredIds] = useState<string[]>([]);
     const navigate = useNavigate();
 
+    const fetchDashboard = async () => {
+        try {
+            const response = await axios.get(`${baseURL}/teacher/dashboard-data`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setData(response.data);
+            const demoRes = await axios.get(`${baseURL}/teacher/available-demos`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAvailableDemos(demoRes.data);
+        } catch (err) {
+            console.error("Failed to fetch dashboard data");
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const fetchDashboard = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/teacher/dashboard-data`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setData(response.data);
-                const demoRes = await axios.get(`${baseURL}/teacher/available-demos`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setAvailableDemos(demoRes.data);
-            } catch (err) {
-                console.error("Failed to fetch dashboard data");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchDashboard();
     }, [token]);
 
@@ -53,7 +53,9 @@ function TeacherDashboard() {
 
     const { profile } = data;
     const filteredDemos = availableDemos.filter(d => !ignoredIds.includes(d._id));
-
+    const sortedClasses = [...data.classes].sort((a, b) =>
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    );
     const handleLogout = () => {
         useAuthStore.getState().logout();
         useAdminStore.getState().logout();
@@ -97,23 +99,23 @@ function TeacherDashboard() {
             <Paper sx={{ p: 3, mb: 3, bgcolor: '#f0f4f8' }}>
                 <Typography variant="h4">Welcome, {profile?.firstName}!</Typography>
                 <Grid container spacing={2} sx={{ mt: 1 }}>
-                    <Grid item>
+                    <Grid>
                         <Typography variant="body1"><strong>📧 Email:</strong> {profile?.email}</Typography>
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <Typography variant="body1"><strong>📚 Subject:</strong> {profile?.subject}</Typography>
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <Typography variant="body1"><strong>🎓 Qualification:</strong> {profile?.qualification}</Typography>
                     </Grid>
-                    <Grid item>
+                    <Grid>
                         <Typography variant="body1"><strong>⏳ Experience:</strong> {profile?.experience} Years</Typography>
                     </Grid>
                 </Grid>
                 <Button onClick={handleLogout}>Logout</Button>
             </Paper>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     {/* {data.demos.length > 0 && ( */}
                     <Paper sx={{ p: 3, mb: 3, borderLeft: '6px solid #4caf50' }}>
                         <Typography variant="h6" color="success.main">🤝 Upcoming Accepted Demos</Typography>
@@ -172,15 +174,15 @@ function TeacherDashboard() {
                         </List>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                     <Paper sx={{ p: 3, minHeight: '400px' }}>
                         <Typography variant="h6" color="primary">Upcoming Classes</Typography>
                         <Divider sx={{ my: 2 }} />
                         {data.classes.length > 0 ? (
-                            data.classes.map((cls: any) => (
+                            sortedClasses.map((cls: any) => (
                                 <Card key={cls._id} variant="outlined" sx={{ mb: 2, p: 2, borderLeft: '6px solid #1976d2' }}>
                                     <Grid container alignItems="center">
-                                        <Grid item xs={8}>
+                                        <Grid size={{ xs: 8 }}>
                                             <Typography variant="subtitle1" fontWeight="bold">
                                                 {cls.studentId.firstName} - {cls.subject}
                                             </Typography>
@@ -188,7 +190,7 @@ function TeacherDashboard() {
                                                 📅 {new Date(cls.startTime).toLocaleString([], { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                             </Typography>
                                         </Grid>
-                                        <Grid item xs={4} textAlign="right">
+                                        <Grid size={{ xs: 4 }} textAlign="right">
                                             <Button variant="contained" href={cls.meetingLink} target="_blank">
                                                 Join Meeting
                                             </Button>
@@ -209,7 +211,7 @@ function TeacherDashboard() {
                         <Typography variant="body2" sx={{ mb: 2 }}>These students are looking for a trial session:</Typography>
                         <Grid container spacing={2}>
                             {filteredDemos.map(student => (
-                                <Grid item xs={12} sm={6} md={4} key={student._id}>
+                                <Grid size={{ xs: 12, sm: 8, md: 4 }} key={student._id}>
                                     <Card sx={{ p: 2, borderLeft: '5px solid #fbc02d' }}>
                                         <Typography fontWeight="bold">{student.firstName} {student.lastName}</Typography>
                                         <Typography variant="body2">Subject: {student.subject}</Typography>

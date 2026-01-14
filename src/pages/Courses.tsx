@@ -20,37 +20,37 @@ function Courses() {
   }, []);
   const now = new Date();
   if (!user) return null;
-    const demoTime = new Date(user.demoSlot);
-    
-    // Calculate if it's "Join Time" (e.g., button appears 10 mins before)
-    const tenMinutesBefore = new Date(demoTime.getTime() - 10 * 60000);
-    const isJoinable = now >= tenMinutesBefore && now <= new Date(demoTime.getTime() + 60 * 60000);
+  const demoTime = new Date(user.demoSlot);
 
-    const meetingLink = `https://meet.jit.si/Demo-${user._id}`;
+  // Calculate if it's "Join Time" (e.g., button appears 10 mins before)
+  const tenMinutesBefore = new Date(demoTime.getTime() - 10 * 60000);
+  const isJoinable = now >= tenMinutesBefore && now <= new Date(demoTime.getTime() + 60 * 60000);
+
+  const meetingLink = `https://meet.jit.si/Demo-${user._id}`;
   return (
     <section>
 
       {user?.demoSlot && new Date(user.demoSlot) > now && (
         <Paper sx={{ p: 2, mb: 3, bgcolor: '#e3f2fd', borderLeft: '6px solid #1976d2' }}>
-            <Typography variant="h6">Upcoming Demo: {user.subject || 'Trial'}</Typography>
-            <Typography>{demoTime.toLocaleString()}</Typography>
-            
-            {isJoinable ? (
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    fullWidth 
-                    sx={{ mt: 2 }}
-                    href={meetingLink}
-                    target="_blank"
-                >
-                    Join Demo Now
-                </Button>
-            ) : (
-                <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
-                    The Join button will appear 10 minutes before the start time.
-                </Typography>
-            )}
+          <Typography variant="h6">Upcoming Demo: {user.subject || 'Trial'}</Typography>
+          <Typography>{demoTime.toLocaleString()}</Typography>
+
+          {isJoinable ? (
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              href={meetingLink}
+              target="_blank"
+            >
+              Join Demo Now
+            </Button>
+          ) : (
+            <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
+              The Join button will appear 10 minutes before the start time.
+            </Typography>
+          )}
         </Paper>
       )}
       <Box sx={{ flexGrow: 1, p: 4 }}>
@@ -103,7 +103,7 @@ function Courses() {
 
         <Grid container spacing={4}>
           {curriculum.map((tech) => (
-            <Grid item xs={12} md={6} lg={4} key={tech.id}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={tech.id}>
               <Card sx={{ height: '100%', borderRadius: 4, boxShadow: 3, width: "100%" }}>
                 <CardContent>
                   <Typography variant="h5" color="primary" gutterBottom>
