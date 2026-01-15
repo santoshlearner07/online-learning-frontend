@@ -1,11 +1,16 @@
 export interface FormData {
     firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role: string;
+    confirmPassword: string;
 }
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { Box, Button, FormControl, Grid, Input, InputLabel } from '@mui/material';
+import { Box, Button, FormControl, Grid, Input, InputLabel, Typography } from '@mui/material';
 import axios from 'axios';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { InputAdornment, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { LinearProgress } from '@mui/material';
 import './Register.scss';
 
 function Register() {
@@ -14,11 +19,45 @@ function Register() {
     const baseUrl = 'http://localhost:5000/api/register'
 
     const [formData, setFormData] = useState<FormData>({
-        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student'
+        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student', confirmPassword: "",
     });
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
-    
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault(); // Prevents losing focus on the input
+    };
+    const getPasswordStrength = (password: string) => {
+        let score = 0;
+        if (!password) return score;
+
+        if (password.length >= 8) score += 1; // Length check
+        if (/[A-Z]/.test(password)) score += 1; // Uppercase check
+        if (/[0-9]/.test(password)) score += 1; // Number check
+        if (/[!@#$%^&*]/.test(password)) score += 1; // Symbol check
+
+        return score;
+    }
+    const strengthScore = getPasswordStrength(formData.password);
+
+    // Determine color based on score
+    const getStrengthColor = () => {
+        switch (strengthScore) {
+            case 1: return 'error';   // Red
+            case 2: return 'warning'; // Orange
+            case 3: return 'info';    // Blue
+            case 4: return 'success'; // Green
+            default: return 'error';
+        }
+    };
+
+    const getStrengthLabel = () => {
+        const labels = ["Too Weak", "Weak", "Fair", "Good", "Strong"];
+        return labels[strengthScore];
+    };
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -66,6 +105,11 @@ function Register() {
             setIsError(true);
             return;
         }
+        if (formData.password !== formData.confirmPassword) {
+            setMessage('Passwords do not match.');
+            setIsError(true);
+            return;
+        }
 
         // 4. Age Check (Logical validation)
         if (formData.userAge < 5 || formData.userAge > 100) {
@@ -86,7 +130,7 @@ function Register() {
             setIsError(false);
 
             setFormData({
-                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student'
+                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student', confirmPassword: ''
             });
 
         } catch (error) {
@@ -149,17 +193,53 @@ function Register() {
                             </Grid>
 
                             <Grid size={{ xs: 12 }}>
-                                <FormControl fullWidth className='form-control'>
+                                <FormControl fullWidth className='form-control' variant="standard">
                                     <InputLabel>Password</InputLabel>
                                     <Input
-                                        type="password"
+                                        name="password"
+                                        type={showPassword ? 'text' : 'password'} // ⭐️ Toggle type
                                         value={formData.password}
-                                        name='password'
                                         onChange={handleChange}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
                                     />
+                                    {formData.password.length > 0 && (
+                                        <Box sx={{ mt: 1 }}>
+                                            <LinearProgress
+                                                variant="determinate"
+                                                value={(strengthScore / 4) * 100}
+                                                color={getStrengthColor()}
+                                                sx={{ height: 6, borderRadius: 5 }}
+                                            />
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                                                Strength: <strong>{getStrengthLabel()}</strong>
+                                            </Typography>
+                                        </Box>
+                                    )}
                                     <p style={{ fontSize: '11px', color: '#666', margin: '5px 0' }}>
                                         Min. 8 chars, 1 Uppercase, 1 Number & 1 Symbol (!@#$)
                                     </p>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Confirm Password</InputLabel>
+                                    <Input
+                                        type="password" // Usually keep this hidden for security
+                                        name="confirmPassword"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                    />
                                 </FormControl>
                             </Grid>
 
