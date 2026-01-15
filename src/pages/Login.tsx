@@ -64,30 +64,51 @@ function Login() {
 
     return (
         <section className='loginSection'>
-
             <form onSubmit={handleSubmit}>
                 <h1>User Login</h1>
 
                 {message && (
-                    <div style={{ color: isError ? 'red' : 'green', margin: '10px 0' }}>
-                        **{message}**
+                    <div style={{
+                        color: isError ? 'red' : 'green',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        padding: '5px'
+                    }}>
+                        {message}
                     </div>
                 )}
-                <FormControl className='form-control'>
+
+                <FormControl fullWidth className='form-control'>
                     <InputLabel htmlFor="email">Email</InputLabel>
                     <Input id="email" type="email" name="email" value={loginData.email} onChange={handleChange} required />
                 </FormControl>
-                <FormControl>
+
+                <FormControl fullWidth className='form-control'>
                     <InputLabel htmlFor="password">Password</InputLabel>
                     <Input id="password" type="password" name="password" value={loginData.password} onChange={handleChange} required />
-                </FormControl> <br /><br />
-                <Button type="submit" style={{ backgroundColor: "green", color: "black" }}>
+                </FormControl>
+
+                <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                        mt: 2,
+                        backgroundColor: "green",
+                        color: "white", // Black on Green is hard to read (Accessibility)
+                        '&:hover': { backgroundColor: 'darkgreen' }
+                    }}
+                >
                     Log In
-                </Button> <br /><br />
-                <span style={{ fontWeight: "bold",display:"flex",justifyContent:"space-between" }} >
-                    <span> Not a member? <Link to="/register" style={{ font: "15px", color: "black" }}>Register</Link></span>
-                    <span>  <Link to="/admin" style={{ font: "15px", color: "black" }}>Admin Login</Link></span>
-                </span>
+                </Button>
+
+                <div className="links-container">
+                    <span>
+                        Not a member? <Link to="/register" style={{ color: "black" }}>Register</Link>
+                    </span>
+                    <span>
+                        <Link to="/admin" style={{ color: "black" }}>Admin Login</Link>
+                    </span>
+                </div>
             </form>
         </section>
     )

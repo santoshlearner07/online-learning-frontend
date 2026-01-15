@@ -1,22 +1,24 @@
 export interface FormData {
-    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role:string;
+    firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; password: string; role: string;
 }
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { Button, FormControl, Grid, Input, InputLabel } from '@mui/material';
+import { Box, Button, FormControl, Grid, Input, InputLabel } from '@mui/material';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './Register.scss';
 
 function Register() {
-
+    const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(gmail|yahoo)\.com$/;
     const baseUrl = 'http://localhost:5000/api/register'
 
     const [formData, setFormData] = useState<FormData>({
-        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role:'student'
+        firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student'
     });
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
+    
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -41,8 +43,36 @@ function Register() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setMessage('Submitting...');
+        setMessage('');
         setIsError(false);
+
+        // 1. Basic Field Check
+        if (!formData.firstName || !formData.lastName || !formData.password) {
+            setMessage('All fields are required.');
+            setIsError(true);
+            return;
+        }
+
+        // 2. Email Validation (@gmail or @yahoo only)
+        if (!EMAIL_REGEX.test(formData.email)) {
+            setMessage('Email must be a valid @gmail.com or @yahoo.com address.');
+            setIsError(true);
+            return;
+        }
+
+        // 3. Password Complexity Check
+        if (!PWD_REGEX.test(formData.password)) {
+            setMessage('Password must be 8+ chars with a Capital letter, Number, and Symbol.');
+            setIsError(true);
+            return;
+        }
+
+        // 4. Age Check (Logical validation)
+        if (formData.userAge < 5 || formData.userAge > 100) {
+            setMessage('Please enter a valid age (5-100).');
+            setIsError(true);
+            return;
+        }
 
         if (isNaN(formData.phoneNumber) || isNaN(formData.userAge)) {
             setMessage('Invalid input for Phone Number or Age.');
@@ -56,7 +86,7 @@ function Register() {
             setIsError(false);
 
             setFormData({
-                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role:'student'
+                firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student'
             });
 
         } catch (error) {
@@ -74,61 +104,112 @@ function Register() {
 
     return (
         <section className='register'>
-            <Grid container spacing={2}>
-                <Grid size={6}>
-                    SOmething
+            {/* ⭐️ Use container spacing and proper breakpoints */}
+            <Grid container sx={{ minHeight: '100vh' }}>
+
+                {/* ⭐️ Hidden on mobile, shown on medium screens and up */}
+                <Grid size={{ xs: false, md: 6 }} sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center' }}>
+                    <Box sx={{ p: 4, textAlign: 'center' }}>
+                        {/* Replace with your 2 images */}
+                        <img src="img1.jpg" alt="img1" style={{ width: '80%', marginBottom: '20px' }} />
+                        <img src="img2.jpg" alt="img2" style={{ width: '80%' }} />
+                    </Box>
                 </Grid>
-                <Grid size={6} className="secondGrid">
 
+                <Grid size={{ xs: 12, md: 6 }} className="secondGrid">
                     <form onSubmit={handleSubmit}>
-                    <h1>Register</h1> <br />
+                        <h1>Register</h1>
 
-                    {message && (
-                        <div style={{ color: isError ? 'red' : 'green', margin: '10px 0' }}>
-                            {message}
-                        </div>
-                    )}
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">First name</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.firstName} name='firstName' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Last name</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.lastName} name='lastName' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Email address</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.email} name='email' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Password</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.password} name='password' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Phone number</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.phoneNumber} name='phoneNumber' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Address</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.userAddress} name='userAddress' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Country</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.country} name='country' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <InputLabel htmlFor="my-input">Age</InputLabel>
-                            <Input id="my-input" aria-describedby="my-helper-text" value={formData.userAge} name='userAge' onChange={handleChange} />
-                        </FormControl>
-                        <FormControl className='form-control'>
-                            <Button type="submit" disabled={!formData}>Register</Button>
-                        </FormControl>
-                    <p>Already a member? <Link to="/login">Sign In</Link></p>
+                        {message && (
+                            <div style={{ color: isError ? 'red' : 'green', margin: '10px 0', textAlign: 'center' }}>
+                                {message}
+                            </div>
+                        )}
+
+                        <Grid container spacing={1}>
+                            {/* ⭐️ Split Name fields on desktop, stack on mobile */}
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>First name</InputLabel>
+                                    <Input value={formData.firstName} name='firstName' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Last name</InputLabel>
+                                    <Input value={formData.lastName} name='lastName' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Email address</InputLabel>
+                                    <Input value={formData.email} name='email' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Password</InputLabel>
+                                    <Input
+                                        type="password"
+                                        value={formData.password}
+                                        name='password'
+                                        onChange={handleChange}
+                                    />
+                                    <p style={{ fontSize: '11px', color: '#666', margin: '5px 0' }}>
+                                        Min. 8 chars, 1 Uppercase, 1 Number & 1 Symbol (!@#$)
+                                    </p>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Phone number</InputLabel>
+                                    <Input type="number" value={formData.phoneNumber === 0 ? '' : formData.phoneNumber} name='phoneNumber' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Age</InputLabel>
+                                    <Input type="number" value={formData.userAge === 0 ? '' : formData.userAge} name='userAge' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Address</InputLabel>
+                                    <Input value={formData.userAddress} name='userAddress' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <FormControl fullWidth className='form-control'>
+                                    <InputLabel>Country</InputLabel>
+                                    <Input value={formData.country} name='country' onChange={handleChange} />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
+                                <Button
+                                    fullWidth
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={message === 'Submitting...'} // Prevent double-submit
+                                >
+                                    {message === 'Submitting...' ? 'Creating Account...' : 'Register'}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <p style={{ textAlign: 'center', marginTop: '15px' }}>
+                            Already a member? <Link to="/login">Sign In</Link>
+                        </p>
                     </form>
                 </Grid>
             </Grid>
         </section>
-    )
+    );
 }
 
 export default Register
