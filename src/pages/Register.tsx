@@ -126,7 +126,7 @@ function Register() {
         try {
             const response = await axios.post(baseUrl, formData);
 
-            setMessage(response.data.msg || 'Registration successful!');
+            setMessage(response.data.msg || setMessage('Success! Please check your email to verify your account before logging in.'));
             setIsError(false);
 
             setFormData({
@@ -148,10 +148,8 @@ function Register() {
 
     return (
         <section className='register'>
-            {/* ⭐️ Use container spacing and proper breakpoints */}
             <Grid container sx={{ minHeight: '100vh' }}>
 
-                {/* ⭐️ Hidden on mobile, shown on medium screens and up */}
                 <Grid size={{ xs: false, md: 6 }} sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center' }}>
                     <Box sx={{ p: 4, textAlign: 'center' }}>
                         {/* Replace with your 2 images */}
@@ -171,7 +169,6 @@ function Register() {
                         )}
 
                         <Grid container spacing={1}>
-                            {/* ⭐️ Split Name fields on desktop, stack on mobile */}
                             <Grid size={{ xs: 12, sm: 6 }}>
                                 <FormControl fullWidth className='form-control'>
                                     <InputLabel>First name</InputLabel>
