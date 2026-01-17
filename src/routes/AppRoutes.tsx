@@ -1,4 +1,6 @@
-export const baseURL = 'http://localhost:5000/api'
+// export const baseURL = 'http://localhost:5000/api'
+export const baseURL = 'https://itb-learning.onrender.com/'
+
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Register from '../pages/Register'
