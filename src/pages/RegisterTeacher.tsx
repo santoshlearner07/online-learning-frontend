@@ -58,43 +58,43 @@ const RegisterTeacher: React.FC = () => {
 
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth label="Full Name" name="firstName"
                                 value={formData.firstName} onChange={handleChange} required
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth label="Email Address" name="email" type="email"
                                 value={formData.email} onChange={handleChange} required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={{ xs: 6 }}>
                             <TextField
                                 fullWidth label="Subject Specialty" name="subject"
                                 value={formData.subject} onChange={handleChange}
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={{ xs: 6 }}>
                             <TextField
                                 fullWidth label="Years of Experience" name="experience" type="number"
                                 value={formData.experience} onChange={handleChange}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth label="Highest Qualification" name="qualification"
                                 value={formData.qualification} onChange={handleChange}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField
                                 fullWidth label="Phone Number" name="phoneNumber" type="number"
                                 value={formData.phoneNumber} onChange={handleChange}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
                                 Submit Teacher Profile
                             </Button>

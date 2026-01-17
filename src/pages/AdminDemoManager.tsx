@@ -2,8 +2,6 @@ import axios from "axios";
 import { baseURL } from "../routes/AppRoutes";
 import { Box, Button, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { useAuthStore } from "../store/useAuthStore";
-import { useAdminStore } from "../store/useAdminStore";
-import { useEffect, type JSXElementConstructor, type Key, type ReactElement, type ReactNode, type ReactPortal } from "react";
 
 export const AdminDemoManager = ({ allUsers, allTeachers, refreshData }: any) => {
     const { token } = useAuthStore();

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { baseURL } from '../routes/AppRoutes';
 
-export const AdminPayment = ({ students,refreshData }: { students: any[]; refreshData:any }) => {
+export const AdminPayment = ({ students }: { students: any[]; refreshData:any }) => {
         const { refreshUser } = useAuthStore();
     
     const token = useAuthStore.getState().token;

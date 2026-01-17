@@ -19,7 +19,7 @@ function Dashboard() {
       const API_PROFILE_URL = `${baseURL}/profile`;
     
       const [open, setOpen] = React.useState(false);
-      const { user, token, updateDemoStatus, setUser, setToken,refreshUser } = useAuthStore();
+      const { user, token, updateDemoStatus, setUser, setToken } = useAuthStore();
       const [formData, setFormData] = useState<DemoBookingData>({
         subject: '',
         preferredDate: '',

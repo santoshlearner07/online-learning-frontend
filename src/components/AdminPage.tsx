@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSXElementConstructor, type Key, type ReactElement, type ReactNode, type ReactPortal } from 'react';
+import { useEffect, useState} from 'react';
 import { useAdminStore } from '../store/useAdminStore';
 import RegisterTeacher from '../pages/RegisterTeacher';
 import { useAuthStore } from '../store/useAuthStore';
@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import AllocateStudent from '../components/AllocateStudent'
 import { Box, Button, Paper, Typography } from '@mui/material';
 import AdminScheduler from './AdminScheduler';
-import { AdminPayment } from '../pages/AdminPaymennt';
+import { AdminPayment } from '../pages/AdminPayment';
 import { AdminDemoManager } from '../pages/AdminDemoManager';
 import { Tabs, Tab, TextField, InputAdornment, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -18,13 +18,13 @@ function AdminPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedTeacherId, setSelectedTeacherId] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const refreshData = async () => {
-        await Promise.all([
-            fetchAllUsers(),
-            fetchAllAdmins(),
-            fetchAllTeachers()
-        ]);
-    };
+    // const refreshData = async () => {
+    //     await Promise.all([
+    //         fetchAllUsers(),
+    //         fetchAllAdmins(),
+    //         fetchAllTeachers()
+    //     ]);
+    // };
 
     const filteredUsers = allUsers.filter(u =>
         u.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -115,7 +115,7 @@ const TableSection = ({ title, data }: { title: string, data: any[] }) => (
                 }}
             />
 
-            <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ mb: 3 }}>
+            <Tabs value={tabValue} onChange={(_e, newValue) => setTabValue(newValue)} sx={{ mb: 3 }}>
                 <Tab label={`Demos (${unclaimedDemos})`} />
                 <Tab label={`Payments (${pendingPayments})`} />
                 <Tab label="Manage Classes" />

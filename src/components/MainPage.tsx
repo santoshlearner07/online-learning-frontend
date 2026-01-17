@@ -48,7 +48,7 @@ function MainPage() {
           </Typography>
           <Grid container spacing={4}>
             {roadmapData1.map((item, index) => (
-              <Grid item xs={12} md={6} lg={4} key={index}>
+              <Grid size={{xs:12,md:6,lg:4}} key={index}>
                 <Card elevation={3} sx={{ height: '100%', borderRadius: 4 }}>
                   <CardContent>
                     <Typography variant="h5" color="primary" gutterBottom sx={{ fontWeight: 600 }}>

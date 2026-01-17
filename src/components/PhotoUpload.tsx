@@ -14,7 +14,7 @@ const PhotoUpload: React.FC = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const displayImage = localPreview || (user?.profileImagePath ? `${BASE_URL}${user.profileImagePath}` : null);
+    const displayImage = localPreview || (user?.profileImagePath ? `${baseURL}${user.profileImagePath}` : null);
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
