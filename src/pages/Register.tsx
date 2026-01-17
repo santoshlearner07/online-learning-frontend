@@ -12,11 +12,12 @@ import { InputAdornment, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { LinearProgress } from '@mui/material';
 import './Register.scss';
+import { baseURL } from '../routes/AppRoutes';
 
 function Register() {
     const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
     const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@(gmail|yahoo)\.com$/;
-    const baseUrl = 'http://localhost:5000/api/register'
+    const REGISTER_API = `${baseURL}/register`
 
     const [formData, setFormData] = useState<FormData>({
         firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'student', confirmPassword: "",
@@ -124,7 +125,7 @@ function Register() {
             return;
         }
         try {
-            const response = await axios.post(baseUrl, formData);
+            const response = await axios.post(REGISTER_API, formData);
 
             setMessage(response.data.msg || setMessage('Success! Please check your email to verify your account before logging in.'));
             setIsError(false);

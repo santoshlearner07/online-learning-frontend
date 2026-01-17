@@ -1,9 +1,9 @@
 import React, { useState, useRef, type ChangeEvent } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore'; 
+import { baseURL } from '../routes/AppRoutes';
 
-const API_UPLOAD_URL = 'http://localhost:5000/api/upload';
-const BASE_URL = 'http://localhost:5000';
+const API_UPLOAD_URL = `${baseURL}/upload`;
 
 const PhotoUpload: React.FC = () => {
     const { user, token, updateProfileImage } = useAuthStore();

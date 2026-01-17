@@ -13,9 +13,10 @@ import PhotoUpload from '../components/PhotoUpload';
 import { Button, Modal,  Box, TextField, Select, MenuItem } from '@mui/material';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
+import { baseURL } from '../routes/AppRoutes';
 function Dashboard() {
-      const API_URL = 'http://localhost:5000/api/demo-booking';
-      const API_PROFILE_URL = 'http://localhost:5000/api/profile';
+      const API_URL = `${baseURL}/demo-booking`;
+      const API_PROFILE_URL = `${baseURL}/profile`;
     
       const [open, setOpen] = React.useState(false);
       const { user, token, updateDemoStatus, setUser, setToken,refreshUser } = useAuthStore();

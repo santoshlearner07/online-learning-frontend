@@ -9,10 +9,11 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import './Login.scss'
 import { useAuthStore } from '../store/useAuthStore';
+import { baseURL } from '../routes/AppRoutes';
 
 function Login() {
 
-    const API_URL = 'http://localhost:5000/api/login';
+    const API_URL = `${baseURL}/login`;
 
     const [loginData, setLoginData] = useState<FormLoginData>({
         email: '',

@@ -7,10 +7,11 @@ import { Button, FormControl, Grid, Input, InputLabel } from '@mui/material';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import './Register.scss';
+import { baseURL } from '../routes/AppRoutes';
 
 function AdminRegister() {
     const navigate = useNavigate();
-    const baseUrl = 'http://localhost:5000/api/admin/register'
+    const baseUrl = `${baseURL}/admin/register`
 
     const [formData, setFormData] = useState<FormData>({
         firstName: '', email: '', lastName: '', phoneNumber: 0, country: "", userAddress: "", userAge: 0, password: "", role: 'admin'

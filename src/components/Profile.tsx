@@ -8,6 +8,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import PinIcon from '@mui/icons-material/Pin';
 import HomeIcon from '@mui/icons-material/Home';
 import { useAuthStore } from '../store/useAuthStore';
+import { baseURL } from '../routes/AppRoutes';
 
 function Profile() {
     const { user, token,  setUser } = useAuthStore();
@@ -57,7 +58,7 @@ function Profile() {
                 },
             };
 
-            const { data } = await axios.put(`http://localhost:5000/api/profile`, formData, config);
+            const { data } = await axios.put(`${baseURL}/profile`, formData, config);
             setUser(data.user)
             alert("Profile updated!");
 
