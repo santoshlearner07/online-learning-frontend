@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore'; 
 import { baseURL } from '../routes/AppRoutes';
 
-const API_UPLOAD_URL = `${baseURL}/upload`;
 
 const PhotoUpload: React.FC = () => {
     const { user, token, updateProfileImage } = useAuthStore();
@@ -11,9 +10,10 @@ const PhotoUpload: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [localPreview, setLocalPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
-
+    
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    
+    const API_UPLOAD_URL = `${baseURL}/upload`;
     const displayImage = localPreview || (user?.profileImagePath ? `${baseURL}${user.profileImagePath}` : null);
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {

@@ -4,13 +4,11 @@ export interface FormData {
 }
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { Box, Button, FormControl, Grid, Input, InputLabel, Typography } from '@mui/material';
+import { Box, Button, FormControl, Grid, Input, InputLabel, Typography,InputAdornment, IconButton,LinearProgress } from '@mui/material';
 import axios from 'axios';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { InputAdornment, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { LinearProgress } from '@mui/material';
 import './Register.scss';
 import { baseURL } from '../routes/AppRoutes';
 

@@ -4,11 +4,10 @@ import RegisterTeacher from '../pages/RegisterTeacher';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import AllocateStudent from '../components/AllocateStudent'
-import { Box, Button, Paper, Typography } from '@mui/material';
+import { Box, Button, Paper, Typography,Tabs, Tab, TextField, InputAdornment, Chip } from '@mui/material';
 import AdminScheduler from './AdminScheduler';
 import { AdminPayment } from '../pages/AdminPayment';
 import { AdminDemoManager } from '../pages/AdminDemoManager';
-import { Tabs, Tab, TextField, InputAdornment, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { TeacherActivityModal } from './TeacherActivityModal';
 function AdminPage() {
