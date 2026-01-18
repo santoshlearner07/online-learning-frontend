@@ -13,6 +13,7 @@ import AdminRegister from '../pages/AdminRegister'
 import AdminPage from '../components/AdminPage'
 import Dashboard from '../pages/Dashboard'
 import TeacherDashboard from '../pages/TeacherDashboard'
+import VerifyEmail from '../components/VerifyEmail'
 
 function AppRoutes() {
     return (
@@ -22,6 +23,7 @@ function AppRoutes() {
                 <Routes>
                     <Route path='/' element={<MainPage />} />
                     <Route path='/register' element={<Register />} />
+                    <Route path="/verify-email/:token" element={<VerifyEmail />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/' element={<MainPage />} >
                         <Route index element={<Dashboard />} /> {/* Path: /main/ */}
