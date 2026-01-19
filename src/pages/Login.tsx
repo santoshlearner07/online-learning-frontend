@@ -46,9 +46,6 @@ function Login() {
             useAuthStore.getState().setToken(token);
             setMessage(`Welcome back, ${firstName}! You are now logged in.`);
             setIsError(false);
-
-            console.log('User Data:', response);
-
             navigate('/');
 
         } catch (error) {

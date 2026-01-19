@@ -1,188 +1,200 @@
-export interface UserDetails {
-  _id: string;
-  firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; demoStatus: string; demoSlot: string; subject: string; profileImagePath:string
-  paymentReference:string; paymentStatus:string;
-}
-export interface DemoBookingData {
-  subject: string;
-  preferredDate: string;
-  preferredTime: string;
-}
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import PhotoUpload from '../components/PhotoUpload';
-import { Button, Modal,  Box, TextField, Select, MenuItem } from '@mui/material';
+import {
+  Button, Modal, Box, TextField, Select, MenuItem,
+  Grid, Card, CardContent, Typography, Paper, Divider, Avatar
+} from '@mui/material';
+import {
+  RocketLaunch, EventAvailable, School,
+  LaptopMac, WorkspacePremium
+} from '@mui/icons-material';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { baseURL } from '../routes/AppRoutes';
+
+const modalStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: { xs: '90%', sm: 400 },
+  bgcolor: 'background.paper',
+  borderRadius: 3,
+  boxShadow: 24,
+  p: 4,
+};
+
 function Dashboard() {
-      const API_URL = `${baseURL}/demo-booking`;
-      const API_PROFILE_URL = `${baseURL}/profile`;
-    
-      const [open, setOpen] = React.useState(false);
-      const { user, token, updateDemoStatus, setUser, setToken } = useAuthStore();
-      const [formData, setFormData] = useState<DemoBookingData>({
-        subject: '',
-        preferredDate: '',
-        preferredTime: ''
-      });
-      const subjects = ['Coding', 'Math', 'Web Development', 'React.js', 'Python', 'Other'];
-      const handleOpen = () => setOpen(true);
-      const handleClose = () => setOpen(false);
-      const minDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      
-      const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const combinedDateTime = new Date(`${formData.preferredDate}T${formData.preferredTime}`);
-        try {
-          
-         const response= await axios.put(API_URL,
-            { demoSlot: combinedDateTime, subject: formData.subject },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          )
-          updateDemoStatus('SCHEDULED', combinedDateTime.toISOString());
-          alert('Demo Booked Successfully!');
-          useAuthStore.setState({ user: response.data });
-          handleClose();
-        } catch (err) {
-          console.error('Booking failed', err);
-        }
-      };
-    
-      const fetchUserProfile = async (token: string) => {
-        try {
-          const response: any = await axios.get(API_PROFILE_URL, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUser(response.data);
-        } catch (error) {
-          console.error('Failed to fetch initial profile image:', error);
-        }
-      };
-    
-      useEffect(() => {
-        if (token && !user) {
-          fetchUserProfile(token)
-        }
-    
-        if (!user) {
-          const storageData = localStorage.getItem('auth-storage')
-          if (storageData) {
-            const parsed = JSON.parse(storageData);
-            if (parsed.state.user) {
-              setUser(parsed.state.user);
-              setToken(parsed.state.token);
-            }
-          }
-        }
-      }, [token])
-      const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4,
-      };
-    
+  const { user, token, updateDemoStatus, setUser, setToken } = useAuthStore();
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    subject: '',
+    preferredDate: '',
+    preferredTime: ''
+  });
+
+  const subjects = ['Web Development', 'Python for Kids', 'Mobile Apps', 'Robotics', 'Data Science'];
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const minDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const combinedDateTime = new Date(`${formData.preferredDate}T${formData.preferredTime}`);
+    try {
+      const response = await axios.put(`${baseURL}/demo-booking`,
+        { demoSlot: combinedDateTime, subject: formData.subject },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      updateDemoStatus('SCHEDULED', combinedDateTime.toISOString());
+      alert('Demo Booked Successfully!');
+      setUser(response.data);
+      handleClose();
+    } catch (err) {
+      console.error('Booking failed', err);
+    }
+  };
+
+  if (!user) return <Typography sx={{ p: 4 }}>Loading your workspace...</Typography>;
+
   return (
-    <div>
-        <h1>Dashboard</h1>
-              <div style={{ border: "1px solid grey", borderRadius: "10px" }}>
-                {
-                  user ? (
-                    <div>
-                      <PhotoUpload />
-                      <h3>Welcome, {user.firstName}!</h3>
-                    </div>
-                  ) : (
-                    <div></div>
-                  )
-                }
-              </div>
-              <div style={{ marginTop: "10px" }}>
-                <h2>Empower Your Child’s Future with 1:1 Expert Mentorship.</h2>
-                <div style={
-                  { display: "flex" }
-                }>
-                  <div>
-                    Unlock your child's potential with a free <b>1-hour demo class</b> tailored to their interests and skill level. Whether they want to master industry-leading technologies like <b>React, Angular, Python, or MongoDB</b>, or start with the essential building blocks of the web like <b>HTML and CSS</b>, our expert instructors are here to guide them. This no-obligation session is the perfect way to experience our interactive teaching style and see how quickly your child can start building their own digital future. <b>Book your free demo today</b> and let’s start coding!
-                    <br /><br />
-                    <p>
-                      ⭐ No credit/Debit card or Cash required for the demo session.
-                    </p>
-                    {user?.demoStatus === 'PENDING' ? (
-                    <div>
-                      You have got a 1 Free schdeule left book it as early as possible with your convient time and date.
-                      Change this <b>{user?.demoStatus}</b> to Schedule
-        
-                      <p>
-                        <Button color='warning' variant='contained' onClick={handleOpen}>Book a Free Trial</Button>
-                        <Modal
-                          open={open}
-                          onClose={handleClose}
-                          aria-labelledby="modal-modal-title"
-                          aria-describedby="modal-modal-description"
-                        >
-                          <Box sx={style}>
-                            <h3>Demo details</h3>
-                            <form onSubmit={handleSubmit} className="booking-form">
-                              <label>Subject of Interest</label>
-                              <Select
-                                required
-                                value={formData.subject}
-                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                              >
-                                <option value="">Select a Subject</option>
-                                {subjects.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-                              </Select>
-                              <br /><br />
-        
-                              <label>Preferred Date</label>
-                              <TextField
-                                size='small'
-                                type="date"
-                                required
-                                inputProps={{ min: minDate }}
-                                onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                              />
-        
-                              <br /><br />
-                              <label>Preferred Time</label>
-                              <TextField
-                                size='small'
-                                type="time"
-                                required
-                                onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-                              />
-        
-                              <button type="submit">Confirm Demo Session</button>
-                            </form>
-                          </Box>
-                        </Modal>
-                      </p>
-                    </div>
-                     ) : ( 
-                    <div>
-                      Your 1 hour class is {user?.demoStatus} on {user?.demoSlot} of {user?.subject} class. Enjoy it.
-                    </div>
-                     )} 
-                  </div>
-                  <div>
-                    Unlock your child's potential with a free 1-hour demo class tailored to their interests and skill level. Whether they want to master industry-leading technologies like React, Angular, Python, or MongoDB, or start with the essential building blocks of the web like HTML and CSS, our expert instructors are here to guide them. This no-obligation session is the perfect way to experience our interactive teaching style and see how quickly your child can start building their own digital future. Book your free demo today and let’s start coding!
-                  </div>
-                </div>
-              </div>
-    </div>
-  )
+    <Box sx={{ p: { xs: 2, md: 4 }, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+
+      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 3, bgcolor: '#ffffff', border: '1px solid #e0e0e0' }}>
+        <PhotoUpload />
+        <Box>
+          <Typography variant="h4" fontWeight="bold">Welcome back, {user.firstName}! 👋</Typography>
+          <Typography color="textSecondary">Track your progress and upcoming sessions here.</Typography>
+        </Box>
+      </Paper>
+
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2 }}>
+            <School color="primary" sx={{ fontSize: 40 }} />
+            <Typography variant="h6">0</Typography>
+            <Typography variant="body2" color="textSecondary">Classes Completed</Typography>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2 }}>
+            <LaptopMac color="secondary" sx={{ fontSize: 40 }} />
+            <Typography variant="h6">0</Typography>
+            <Typography variant="body2" color="textSecondary">Projects Built</Typography>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2 }}>
+            <WorkspacePremium color="success" sx={{ fontSize: 40 }} />
+            <Typography variant="h6">Beginner</Typography>
+            <Typography variant="body2" color="textSecondary">Learning Level</Typography>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 8 }}>
+          <Card sx={{ borderRadius: 3, height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <RocketLaunch color="warning" />
+                <Typography variant="h5" fontWeight="bold">Your Learning Journey</Typography>
+              </Box>
+
+              <Typography variant="body1" paragraph>
+                At ITB Tuition, we don't just teach code; we build creators. Your journey starts with an expert-led 1:1 session designed to spark curiosity and build confidence.
+              </Typography>
+
+              {user.demoStatus === 'PENDING' ? (
+                <Box sx={{ bgcolor: '#fff9c4', p: 3, borderRadius: 2, border: '1px solid #fbc02d' }}>
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                    🎁 Free Trial Available
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}>
+                    You have <b>1 free session</b> remaining. Pick a date and time that suits you best to start building your first project.
+                  </Typography>
+                  <Button variant="contained" color="warning" onClick={handleOpen} startIcon={<EventAvailable />}>
+                    Book Free Trial Now
+                  </Button>
+                </Box>
+              ) : (
+                <Box sx={{ bgcolor: '#e3f2fd', p: 3, borderRadius: 2, border: '1px solid #2196f3' }}>
+                  <Typography variant="subtitle1" fontWeight="bold">🗓️ Session Scheduled</Typography>
+                  <Typography>
+                    Your 1-hour <b>{user.subject}</b> demo is confirmed for:
+                  </Typography>
+                  <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
+                    {new Date(user.demoSlot).toLocaleString([], { dateStyle: 'long', timeStyle: 'short' })}
+                  </Typography>
+                  <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                    A meeting link will appear in your "Courses" tab 10 minutes before the start.
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card sx={{ borderRadius: 3, bgcolor: '#1a237e', color: 'white' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Why 1:1 Mentorship?</Typography>
+              <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)', mb: 2 }} />
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                ✅ <b>Personalized Pace:</b> No more getting left behind in a crowded classroom.
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                ✅ <b>UK Based Experts:</b> Learn from industry professionals with real-world experience.
+              </Typography>
+              <Typography variant="body2">
+                ✅ <b>Project Based:</b> Every class ends with a tangible result your child can show off.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Modal open={open} onClose={handleClose}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>Book Your Session</Typography>
+          <form onSubmit={handleSubmit}>
+            <Typography variant="caption" color="textSecondary">Select Subject</Typography>
+            <Select
+              fullWidth
+              required
+              value={formData.subject}
+              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+              sx={{ mb: 2, mt: 0.5 }}
+            >
+              {subjects.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+            </Select>
+
+            <Typography variant="caption" color="textSecondary">Select Date</Typography>
+            <TextField
+              fullWidth
+              type="date"
+              required
+              inputProps={{ min: minDate }}
+              onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+              sx={{ mb: 2, mt: 0.5 }}
+            />
+
+            <Typography variant="caption" color="textSecondary">Select Time</Typography>
+            <TextField
+              fullWidth
+              type="time"
+              required
+              onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
+              sx={{ mb: 3, mt: 0.5 }}
+            />
+
+            <Button type="submit" variant="contained" fullWidth size="large">
+              Confirm Booking
+            </Button>
+          </form>
+        </Box>
+      </Modal>
+    </Box>
+  );
 }
 
-export default Dashboard
+export default Dashboard;
