@@ -1,8 +1,20 @@
-import React, { useEffect, useState } from 'react';
+export interface UserDetails {
+  _id: string;
+  firstName: string; lastName: string; email: string; phoneNumber: number; userAddress?: string; country: string; userAge: number; demoStatus: string; demoSlot: string; subject: string; profileImagePath: string
+  paymentReference: string; paymentStatus: string; role: 'student' | 'teacher' | 'admin';
+}
+
+export interface DemoBookingData {
+  subject: string;
+  preferredDate: string;
+  preferredTime: string;
+}
+
+import React, { useState } from 'react';
 import PhotoUpload from '../components/PhotoUpload';
 import {
   Button, Modal, Box, TextField, Select, MenuItem,
-  Grid, Card, CardContent, Typography, Paper, Divider, Avatar
+  Grid, Card, CardContent, Typography, Paper, Divider
 } from '@mui/material';
 import {
   RocketLaunch, EventAvailable, School,
@@ -25,7 +37,7 @@ const modalStyle = {
 };
 
 function Dashboard() {
-  const { user, token, updateDemoStatus, setUser, setToken } = useAuthStore();
+  const { user, token, updateDemoStatus, setUser } = useAuthStore();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     subject: '',
