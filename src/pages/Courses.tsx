@@ -8,6 +8,9 @@ import { baseURL } from '../routes/AppRoutes';
 function Courses() {
   const { user, token, refreshUser } = useAuthStore();
   const [upcoming, setUpcoming] = useState([]);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [now, setNow] = useState(new Date());
+
   useEffect(() => {
     const fetchClasses = async () => {
       const { data } = await axios.get(`${baseURL}/my-schedule`, {
@@ -18,22 +21,32 @@ function Courses() {
     fetchClasses();
     refreshUser();
   }, []);
-  const now = new Date();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const tick = new Date();
+      setCurrentTime(tick);
+      setNow(tick);
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
+
   if (!user) return null;
-  const demoTime = new Date(user.demoSlot);
 
-  // Calculate if it's "Join Time" (e.g., button appears 10 mins before)
-  const tenMinutesBefore = new Date(demoTime.getTime() - 10 * 60000);
-  const isJoinable = now >= tenMinutesBefore && now <= new Date(demoTime.getTime() + 60 * 60000);
-
+  const demoStart = new Date(user.demoSlot);
+  const demoEnd = new Date(demoStart.getTime() + 60 * 60000); // 60 mins after start
+  const isJoinable =
+    currentTime >= new Date(demoStart.getTime() - 10 * 60000) &&
+    currentTime <= new Date(demoStart.getTime() + 50 * 60000);
   const meetingLink = `https://meet.jit.si/Demo-${user._id}`;
+
   return (
     <section>
 
-      {user?.demoSlot && new Date(user.demoSlot) > now && (
+      {user?.demoSlot && now < demoEnd && (
         <Paper sx={{ p: 2, mb: 3, bgcolor: '#e3f2fd', borderLeft: '6px solid #1976d2' }}>
           <Typography variant="h6">Upcoming Demo: {user.subject || 'Trial'}</Typography>
-          <Typography>{demoTime.toLocaleString()}</Typography>
+          <Typography>{demoStart.toLocaleString()}</Typography>
 
           {isJoinable ? (
             <Button
@@ -41,14 +54,16 @@ function Courses() {
               color="primary"
               fullWidth
               sx={{ mt: 2 }}
-              href={meetingLink}
+              href={`${meetingLink}#userInfo.displayName="${user.firstName}"`}
               target="_blank"
             >
               Join Demo Now
             </Button>
           ) : (
             <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
-              The Join button will appear 10 minutes before the start time.
+              {now < demoStart
+                ? "The Join button will appear 10 minutes before the start time."
+                : "The demo session has concluded."}
             </Typography>
           )}
         </Paper>
@@ -86,15 +101,29 @@ function Courses() {
                   Time: {new Date(cls.startTime).toLocaleString()}
                 </Typography>
                 {cls.meetingLink && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    href={cls.meetingLink}
-                    target="_blank"
-                    disabled={new Date() < new Date(new Date(cls.startTime).getTime() - 10 * 60000)} // Enable 10 mins before
-                  >
-                    Join Class
-                  </Button>
+                  (() => {
+                    const nowMs = new Date().getTime();
+                    const classStartMs = new Date(cls.startTime).getTime();
+                    const windowStart = classStartMs - (10 * 60000);
+                    const windowEnd = classStartMs + (50 * 60000);
+                    const isWithinWindow = nowMs >= windowStart && nowMs <= windowEnd;
+                    return isWithinWindow ? (
+                      <Button
+                        variant="contained"
+                        color="success"
+                        href={`${cls.meetingLink}#config.prejoinPageEnabled=false&userInfo.displayName="${user.firstName}"`}
+                        target="_blank"
+                      >
+                        Join Class Now
+                      </Button>
+                    ) : (
+                      <Typography variant="caption" color="textSecondary">
+                        {nowMs < windowStart
+                          ? `Join available at ${new Date(windowStart).toLocaleTimeString()}`
+                          : "Class link expired (50 min limit reached)"}
+                      </Typography>
+                    );
+                  })()
                 )}
               </CardContent>
             </Card>
