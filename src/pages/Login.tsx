@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import './Login.scss'
 import { useAuthStore } from '../store/useAuthStore';
 import { baseURL } from '../routes/AppRoutes';
+// import type { UserDetails } from './Dashboard';
 
 function Login() {
 
@@ -21,7 +22,7 @@ function Login() {
     });
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
-
+    const { setUser, setToken } = useAuthStore();
     const navigate = useNavigate();
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -39,15 +40,16 @@ function Login() {
 
         try {
             const response = await axios.post(API_URL, loginData);
-
-            const { token, firstName, user } = response.data;
-
-            useAuthStore.getState().setUser(user);
-            useAuthStore.getState().setToken(token);
-            setMessage(`Welcome back, ${firstName}! You are now logged in.`);
-            setIsError(false);
-            navigate('/');
-
+            const { token, ...userData } = response.data;
+            if (token) {
+                setToken(token);
+                setUser(userData);
+                setIsError(false);
+                navigate('/');
+            } else {
+                setMessage("Login failed: No token received.");
+            }
+            console.log(userData)
         } catch (error) {
             console.error('Login failed:', error);
 

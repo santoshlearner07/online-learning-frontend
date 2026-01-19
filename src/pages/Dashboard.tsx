@@ -49,6 +49,10 @@ function Dashboard() {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  // const [currentTime, setCurrentTime] = useState(new Date());
+  const now = new Date();
+  const demoStart = user?.demoSlot ? new Date(user.demoSlot) : null;
+  const isDemoOver = demoStart ? now > new Date(demoStart.getTime() + 60 * 60000) : true;
   const minDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,6 +71,16 @@ function Dashboard() {
       console.error('Booking failed', err);
     }
   };
+
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date()); // Forces re-render every minute
+  //   }, 60000);
+  //   return () => clearInterval(timer);
+  // }, []);
+
+
+  // const isDemoOver = demoStart ? currentTime > new Date(demoStart.getTime() + 60 * 60000) : true;
 
   if (!user) return <Typography sx={{ p: 4 }}>Loading your workspace...</Typography>;
 
@@ -128,7 +142,7 @@ function Dashboard() {
                     Book Free Trial Now
                   </Button>
                 </Box>
-              ) : (
+              ) : !isDemoOver ? (
                 <Box sx={{ bgcolor: '#e3f2fd', p: 3, borderRadius: 2, border: '1px solid #2196f3' }}>
                   <Typography variant="subtitle1" fontWeight="bold">🗓️ Session Scheduled</Typography>
                   <Typography>
@@ -139,6 +153,13 @@ function Dashboard() {
                   </Typography>
                   <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
                     A meeting link will appear in your "Courses" tab 10 minutes before the start.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ bgcolor: '#f5f5f5', p: 3, borderRadius: 2, border: '1px solid #bdbdbd' }}>
+                  <Typography variant="subtitle1" fontWeight="bold">🎓 Demo Completed</Typography>
+                  <Typography variant="body2">
+                    We hope you enjoyed your session! Check the <b>Support</b> tab to enroll in the full course.
                   </Typography>
                 </Box>
               )}

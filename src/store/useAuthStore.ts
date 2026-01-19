@@ -17,7 +17,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set,get) => ({
             user: null,
             token: null,
             setUser: (user) => set({ user }),
@@ -34,15 +34,15 @@ export const useAuthStore = create<AuthState>()(
                     user: state.user ? { ...state.user, profileImagePath: imagePath } : null
                 })),
             refreshUser: async () => {
-                const token = localStorage.getItem('token');
+                const token = get().token; // ⭐️ Use get() instead of useAuthStore.getState()
                 if (!token) return;
                 try {
                     const res = await axios.get(`${baseURL}/profile`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    set({ user: res.data }); // Updates the user status to 'PAID'
+                    set({ user: res.data });
                 } catch (err) {
-                    console.error("Could not refresh user state");
+                    console.error("Refresh failed");
                 }
             }
         }),
