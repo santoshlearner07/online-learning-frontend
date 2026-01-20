@@ -10,7 +10,7 @@ export interface DemoBookingData {
   preferredTime: string;
 }
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PhotoUpload from '../components/PhotoUpload';
 import {
   Button, Modal, Box, TextField, Select, MenuItem,
@@ -44,7 +44,7 @@ function Dashboard() {
     preferredDate: '',
     preferredTime: ''
   });
-
+const [stats, setStats] = useState({ completedClasses: 0, classesLeft: 0, level: 'Beginner' });
   const subjects = ['Web Development', 'Python for Kids', 'Mobile Apps', 'Robotics', 'Data Science'];
 
   const handleOpen = () => setOpen(true);
@@ -72,15 +72,20 @@ function Dashboard() {
     }
   };
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setCurrentTime(new Date()); // Forces re-render every minute
-  //   }, 60000);
-  //   return () => clearInterval(timer);
-  // }, []);
-
-
-  // const isDemoOver = demoStart ? currentTime > new Date(demoStart.getTime() + 60 * 60000) : true;
+useEffect(() => {
+    const fetchStats = async () => {
+        try {
+            const { data } = await axios.get(`${baseURL}/student-stats`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setStats(data);
+            console.log(data)
+        } catch (err) {
+            console.error("Stats fetch failed",err);
+        }
+    };
+    if (token) fetchStats();
+}, [token]);
 
   if (!user) return <Typography sx={{ p: 4 }}>Loading your workspace...</Typography>;
 
@@ -97,25 +102,25 @@ function Dashboard() {
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2 }}>
+          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2, borderLeft: '5px solid #4caf50' }}>
             <School color="primary" sx={{ fontSize: 40 }} />
-            <Typography variant="h6">0</Typography>
+            <Typography variant="h6">{stats.completedClasses}</Typography>
             <Typography variant="body2" color="textSecondary">Classes Completed</Typography>
-          </Card>
+        </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2 }}>
+          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2, borderLeft: '5px solid #ff9800' }}>
             <LaptopMac color="secondary" sx={{ fontSize: 40 }} />
-            <Typography variant="h6">0</Typography>
-            <Typography variant="body2" color="textSecondary">Projects Built</Typography>
-          </Card>
+            <Typography variant="h6">{stats.classesLeft}</Typography>
+            <Typography variant="body2" color="textSecondary">Classes Remaining</Typography>
+        </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2 }}>
+          <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2, borderLeft: '5px solid #2196f3' }}>
             <WorkspacePremium color="success" sx={{ fontSize: 40 }} />
-            <Typography variant="h6">Beginner</Typography>
-            <Typography variant="body2" color="textSecondary">Learning Level</Typography>
-          </Card>
+            <Typography variant="h6">{stats.level}</Typography>
+            <Typography variant="body2" color="textSecondary">Current Level</Typography>
+        </Card>
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
