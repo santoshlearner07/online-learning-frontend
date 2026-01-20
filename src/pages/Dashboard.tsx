@@ -14,7 +14,8 @@ import React, { useEffect, useState } from 'react';
 import PhotoUpload from '../components/PhotoUpload';
 import {
   Button, Modal, Box, TextField, Select, MenuItem,
-  Grid, Card, CardContent, Typography, Paper, Divider
+  Grid, Card, CardContent, Typography, Paper, Divider,
+  LinearProgress
 } from '@mui/material';
 import {
   RocketLaunch, EventAvailable, School,
@@ -37,14 +38,14 @@ const modalStyle = {
 };
 
 function Dashboard() {
-  const { user, token, updateDemoStatus, setUser } = useAuthStore();
+  const { user, token, updateDemoStatus, setUser, isHydrated } = useAuthStore();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     subject: '',
     preferredDate: '',
     preferredTime: ''
   });
-const [stats, setStats] = useState({ completedClasses: 0, classesLeft: 0, level: 'Beginner' });
+  const [stats, setStats] = useState({ completedClasses: 0, classesLeft: 0, level: 'Beginner' });
   const subjects = ['Web Development', 'Python for Kids', 'Mobile Apps', 'Robotics', 'Data Science'];
 
   const handleOpen = () => setOpen(true);
@@ -72,55 +73,98 @@ const [stats, setStats] = useState({ completedClasses: 0, classesLeft: 0, level:
     }
   };
 
-useEffect(() => {
+  useEffect(() => {
     const fetchStats = async () => {
-        try {
-            const { data } = await axios.get(`${baseURL}/student-stats`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setStats(data);
-            console.log(data)
-        } catch (err) {
-            console.error("Stats fetch failed",err);
-        }
+      try {
+        const { data } = await axios.get(`${baseURL}/student-stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setStats(data);
+      } catch (err) {
+        console.error("Stats fetch failed", err);
+      }
     };
+    if (isHydrated && token) {
+      fetchStats();
+    }
     if (token) fetchStats();
-}, [token]);
-
+  }, [token]);
+const totalClasses = stats.completedClasses + stats.classesLeft;
+const progressPercentage = totalClasses > 0 
+  ? (stats.completedClasses / totalClasses) * 100 
+  : 0;
   if (!user) return <Typography sx={{ p: 4 }}>Loading your workspace...</Typography>;
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
 
-      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 3, bgcolor: '#ffffff', border: '1px solid #e0e0e0' }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 4,
+          borderRadius: 4,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          bgcolor: '#ffffff',
+          border: '1px solid #eef2f6',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+        }}
+      >
         <PhotoUpload />
+
         <Box>
-          <Typography variant="h4" fontWeight="bold">Welcome back, {user.firstName}! 👋</Typography>
-          <Typography color="textSecondary">Track your progress and upcoming sessions here.</Typography>
+          <Typography variant="h4" fontWeight="800" sx={{ color: '#1a237e' }}>
+            Welcome back, {user?.firstName}! 👋
+          </Typography>
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 0.5 }}>
+            You're currently at the <b>{stats.level}</b> stage. Keep up the great work!
+          </Typography>
         </Box>
       </Paper>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2, borderLeft: '5px solid #4caf50' }}>
-            <School color="primary" sx={{ fontSize: 40 }} />
-            <Typography variant="h6">{stats.completedClasses}</Typography>
-            <Typography variant="body2" color="textSecondary">Classes Completed</Typography>
-        </Card>
+    <School color="primary" sx={{ fontSize: 40 }} />
+    <Typography variant="h6">{stats.completedClasses}</Typography>
+    <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+      Classes Completed
+    </Typography>
+    
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+      <Box sx={{ width: '100%', mr: 1 }}>
+        <LinearProgress 
+          variant="determinate" 
+          value={progressPercentage} 
+          sx={{ 
+            height: 8, 
+            borderRadius: 5, 
+            backgroundColor: '#e0e0e0',
+            '& .MuiLinearProgress-bar': { backgroundColor: '#4caf50' } 
+          }} 
+        />
+      </Box>
+      <Typography variant="caption" color="textSecondary">
+        {Math.round(progressPercentage)}%
+      </Typography>
+    </Box>
+  </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2, borderLeft: '5px solid #ff9800' }}>
             <LaptopMac color="secondary" sx={{ fontSize: 40 }} />
             <Typography variant="h6">{stats.classesLeft}</Typography>
             <Typography variant="body2" color="textSecondary">Classes Remaining</Typography>
-        </Card>
+          </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ borderRadius: 3, textAlign: 'center', p: 2, borderLeft: '5px solid #2196f3' }}>
             <WorkspacePremium color="success" sx={{ fontSize: 40 }} />
             <Typography variant="h6">{stats.level}</Typography>
             <Typography variant="body2" color="textSecondary">Current Level</Typography>
-        </Card>
+          </Card>
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>

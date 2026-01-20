@@ -49,9 +49,9 @@ export function Footer() {
                         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                             Contact Us
                         </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.8 }}>Swansea, Wales, United Kingdom</Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.8 }}>Email: support@itbtuition.com</Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.8 }}>Phone: +44 7000 000000</Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>Llanelli, Wales, United Kingdom</Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>Email: nandiyawarsantosh.0719@gmail.com</Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>Phone: +44 7393 063349</Typography>
                     </Grid>
                 </Grid>
 

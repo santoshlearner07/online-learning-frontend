@@ -9,6 +9,8 @@ interface AuthState {
     token: string | null;
     setUser: (user: UserDetails | null) => void;
     setToken: (token: string | null) => void;
+    isHydrated: boolean; 
+    setHydrated: (val: boolean) => void;
     logout: () => void;
     updateDemoStatus: (status: string, slot: string) => void;
     updateProfileImage: (imagePath: string) => void;
@@ -20,6 +22,8 @@ export const useAuthStore = create<AuthState>()(
         (set,get) => ({
             user: null,
             token: null,
+            isHydrated: false, // Default to false
+            setHydrated: (val) => set({ isHydrated: val }),
             setUser: (user) => set({ user }),
             setToken: (token) => set({ token }),
             logout: () => {
@@ -34,7 +38,7 @@ export const useAuthStore = create<AuthState>()(
                     user: state.user ? { ...state.user, profileImagePath: imagePath } : null
                 })),
             refreshUser: async () => {
-                const token = get().token; // ⭐️ Use get() instead of useAuthStore.getState()
+                const token = get().token;
                 if (!token) return;
                 try {
                     const res = await axios.get(`${baseURL}/profile`, {
@@ -48,6 +52,9 @@ export const useAuthStore = create<AuthState>()(
         }),
         {
             name: 'auth-storage',
+            onRehydrateStorage: () => (state) => {
+                state?.setHydrated(true);
+            },
         }
     )
 );

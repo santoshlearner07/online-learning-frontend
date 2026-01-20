@@ -40,16 +40,15 @@ function Login() {
 
         try {
             const response = await axios.post(API_URL, loginData);
-            const { token, ...userData } = response.data;
+            const { token, user } = response.data;
             if (token) {
                 setToken(token);
-                setUser(userData);
+                setUser(user);
                 setIsError(false);
                 navigate('/');
             } else {
                 setMessage("Login failed: No token received.");
             }
-            console.log(userData)
         } catch (error) {
             console.error('Login failed:', error);
 

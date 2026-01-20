@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from '@mui/material';
+import { AppBar, Avatar, Box, Button, Container, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography, Dialog, DialogContent, Fade } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import AdbIcon from '@mui/icons-material/Adb';
-import { Link, useNavigate } from 'react-router-dom';
-import './UserNavbar.scss'
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../store/useAuthStore';
 import Profile from './Profile';
-import { useAuthStore } from '../store/useAuthStore'
 import DeleteUserAccount from './DeleteUserAccount';
+import './UserNavbar.scss';
 
 const pages = [
   { name: 'Dashboard', path: '/' },
@@ -14,214 +13,111 @@ const pages = [
   { name: 'Support', path: '/support/' }
 ];
 
-const settings = [
-  'Profile', 'Delete Account', 'Logout'
-];
-
 function UserNavbar() {
-  const { token } = useAuthStore();
+  const { token, user, logout } = useAuthStore();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [selectedSetting, setSelectedSetting] = React.useState<string | null>(null);
+  
   const navigate = useNavigate();
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
+  const location = useLocation();
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElUser(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-
-  const [selectedSetting, setSelectedSetting] = React.useState(null);
-
-  const handleSettingClick = (settingName: any) => {
-    setSelectedSetting(settingName);
-    setIsModalOpen(true);
-
+  const handleSettingClick = (setting: string) => {
+    setSelectedSetting(setting);
     handleCloseUserMenu();
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedSetting(null);
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login')
-  }
-
   return (
-    <AppBar position="static">
+    <AppBar position="sticky" sx={{ background: '#1a237e', boxShadow: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            ITB
+          <Typography variant="h5" sx={{ mr: 4, display: { xs: 'none', md: 'flex' }, fontWeight: 800, color: '#fff', letterSpacing: '.1rem' }}>
+            ITB<span style={{ color: '#ff9800' }}>.</span>
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map((page, index) => (
-                <MenuItem key={index} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>
-                    <Link to={page.path}>{page.name}</Link>
-                  </Typography>
+            <IconButton size="large" onClick={handleOpenNavMenu} color="inherit"><MenuIcon /></IconButton>
+            <Menu anchorEl={anchorElNav} open={Boolean(anchorElNav)} onClose={handleCloseNavMenu} TransitionComponent={Fade}>
+              {pages.map((page) => (
+                <MenuItem key={page.name} onClick={() => { handleCloseNavMenu(); navigate(page.path); }}>
+                  <Typography textAlign="center">{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            ITB
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page, index) => (
-              <Button
-                key={index}
 
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+            {token && pages.map((page) => (
+              <Button
+                key={page.name}
+                onClick={() => navigate(page.path)}
+                sx={{ 
+                  my: 2, 
+                  color: location.pathname === page.path ? '#ff9800' : 'white', 
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '1rem'
+                }}
               >
-                {token && <Link to={page.path}>{page.name}</Link>}
+                {page.name}
               </Button>
             ))}
           </Box>
+
           {token ? (
-            <Box sx={{ flexGrow: 0 }}>
-              {/* <Button className='hide-on-mobile' color='warning' variant='contained' style={{marginRight:"10px"}} onClick={handleOpen}>Book a Free Trial</Button> */}
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="" />
+            <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Tooltip title="Profile Settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, border: '2px solid #ff9800' }}>
+                  <Avatar alt={user?.firstName} src={user?.profileImagePath} />
                 </IconButton>
               </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography sx={{ textAlign: 'center' }} onClick={() => handleSettingClick(setting)}>
-                      {setting}
-                    </Typography>
-                  </MenuItem>
-                ))}
+              <Menu sx={{ mt: '45px' }} anchorEl={anchorElUser} open={Boolean(anchorElUser)} onClose={handleCloseUserMenu}>
+                <MenuItem onClick={() => handleSettingClick('Profile')}>Profile Settings</MenuItem>
+                <MenuItem onClick={() => handleSettingClick('Delete')}>Delete Account</MenuItem>
+                <MenuItem onClick={() => handleSettingClick('Logout')} sx={{ color: 'red' }}>Logout</MenuItem>
               </Menu>
             </Box>
           ) : (
-            <div>
-              <Link to="/login">
-                <Button color="inherit">Login</Button>/
-              </Link>
-              <Link to="/register">
-                <Button color="inherit">Register</Button>
-              </Link>
-            </div>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button onClick={() => navigate('/login')} sx={{ color: '#fff' }}>Login</Button>
+              <Button onClick={() => navigate('/register')} variant="contained" color="warning" sx={{ borderRadius: '20px' }}>Register</Button>
+            </Box>
           )}
-
-
         </Toolbar>
       </Container>
-      {isModalOpen && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <h2 style={{ color: "black" }}>{selectedSetting} Settings</h2>
 
-            {/* ⭐️ Conditional Rendering for Modal Content */}
-            {selectedSetting === `Profile` && (
-              <div>
-                <Profile />
-              </div>
-            )}
-            {selectedSetting === 'Delete Account' && (
-              <p style={{ color: "black" }} ><DeleteUserAccount /></p>
-            )}
-            {selectedSetting === 'Logout' && (
-              <div style={{ color: "black" }}>
-                <h1>Are you sure you want to Logout ? </h1>
-                <Button variant="contained" color="success" onClick={handleLogout} >
-                  Logout
-                </Button>
-              </div>
-            )}
-            <button onClick={handleModalClose}>Close</button>
-          </div>
-        </div>
-      )}
+      <Dialog 
+        open={Boolean(selectedSetting)} 
+        onClose={() => setSelectedSetting(null)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3, p: 2 } }}
+      >
+        <DialogContent>
+          {selectedSetting === 'Profile' && <Profile />}
+          {selectedSetting === 'Delete' && <DeleteUserAccount />}
+          {selectedSetting === 'Logout' && (
+            <Box textAlign="center" py={3}>
+              <Typography variant="h5" fontWeight="bold">Ready to leave?</Typography>
+              <Typography color="textSecondary" sx={{ mb: 3 }}>We'll see you for your next coding session!</Typography>
+              <Box display="flex" justifyContent="center" gap={2}>
+                <Button variant="outlined" onClick={() => setSelectedSetting(null)}>Cancel</Button>
+                <Button variant="contained" color="error" onClick={handleLogout}>Confirm Logout</Button>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppBar>
   );
 }

@@ -92,7 +92,7 @@ function Courses() {
 
         {(user?.paymentStatus === 'PAID') && (<Box>
           <Typography variant="h5">Upcoming Classes</Typography>
-          {upcoming.map((cls: any) => (
+          {upcoming.slice(0, 5).map((cls: any) => (
             <Card key={cls._id} sx={{ mb: 2, borderLeft: '5px solid green' }}>
               <CardContent>
                 <Typography variant="h6">{cls.subject}</Typography>
